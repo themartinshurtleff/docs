@@ -10,21 +10,17 @@ I want to explain why this thing exists. Not the marketing pitch. The actual rea
 
 ## The Frustration
 
-I have been trading crypto derivatives for years. And every single tool available to me had the same fundamental problem: it showed me what already happened.
+I have been trading crypto derivatives for years. And every single tool available to me had the same fundamental problem: static models.
 
-Coinglass shows you liquidation data. After the liquidations fire. You see a spike on the chart and think "wow, that was a big liquidation event." Great. The move is done. The opportunity is gone. You are reading the newspaper.
+Coinglass, Kingfisher, Exocharts. They all predict where liquidations sit. That is not the issue. The issue is their models do not adapt. They estimate leverage distributions using fixed assumptions. When market conditions shift, when leverage behavior changes, when a new regime starts, the model stays the same. You are trading on projections that were accurate yesterday but may not be today.
 
-Market Monkey shows historical heatmaps. Same problem. You can look at where clusters were. Past tense. By the time you are studying the heatmap, the market has already swept those levels and moved on.
-
-Exocharts, Kingfisher, every tool I tried. All reactive. All backward-looking. All showing you the aftermath instead of the setup.
-
-I got tired of showing up late to every move.
+I got tired of trusting models that did not keep up with the market.
 
 ## The Question That Started Everything
 
-What if you could see where liquidation clusters would form before price got there?
+What if the model adapted to the market instead of the other way around?
 
-Not where they happened. Where they WILL happen. If you can model open interest distribution across exchanges, track leverage ratios, and project where margin calls will trigger, you can build a map of future liquidation events. Not a guess. A probabilistic model that calibrates itself against live data.
+If you can model open interest distribution across exchanges, track leverage ratios, and project where margin calls will trigger, you can build a map of future liquidation events. But the hard part is not the initial model. The hard part is keeping it accurate. We built a calibrator that uses real forceOrder events as feedback, adjusting leverage weight distributions in real time based on actual liquidation data. Not a static formula. A self-calibrating system.
 
 That is the idea. Simple to state. Hard to build. But that is what we set out to do.
 
@@ -34,7 +30,7 @@ The first decision was the tech stack. And the answer was obvious to me: this co
 
 Browser-based charting tools hit a ceiling fast. Canvas rendering is slow. WebSocket connections are fragile. Memory management is a constant fight. Every existing terminal runs in a browser or wraps one in Electron. And they all feel like it. Sluggish charts. Laggy data. Frozen tabs when the market spikes.
 
-We built TradeNet in Rust. The rendering pipeline uses wgpu for GPU acceleration. Charts render on your graphics card, not your CPU. Data processing runs on dedicated backend servers. Your machine handles display. The servers handle the math.
+We built TradeNet in Rust with the Iced GUI framework. The rendering pipeline uses wgpu (the rendering backend for Iced's canvas) for GPU acceleration. Charts render on your graphics card, not your CPU. Data processing runs on dedicated Python/FastAPI backend servers on Hetzner. Your machine handles display. The servers handle the math.
 
 The result is a terminal that stays smooth when every browser-based tool locks up. During a volatility spike, when data throughput increases tenfold, the terminal does not skip a frame. That is not a nice-to-have. When the market is moving fast, that is exactly when you need your tools to work.
 
@@ -44,15 +40,15 @@ Rust was the right choice for another reason: reliability. No garbage collector 
 
 Crypto liquidity is fragmented. A liquidation cascade on Binance affects Bybit pricing. OI changes on OKX ripple through Hyperliquid. If you are only watching one exchange, you are seeing a fraction of the picture.
 
-TradeNet aggregates data from Binance, Bybit, OKX, and Hyperliquid simultaneously. The liquidation prediction model ingests all four streams. The heatmap reflects the full market, not one exchange's slice of it.
+TradeNet aggregates data from Binance, Bybit, OKX, and Hyperliquid. The liquidation prediction model ingests data from three exchanges (Binance, Bybit, OKX) via WebSocket. Hyperliquid is connected on the frontend for trades and orderflow. The heatmap reflects the combined picture from the three backend exchanges.
 
-This matters more than most people realize. A liquidation cluster that looks small on Binance alone might be massive when you combine all four exchanges. The aggregated view shows you the real magnitude.
+This matters more than most people realize. A liquidation cluster that looks small on Binance alone might be massive when you combine all three exchanges. The aggregated view shows you the real magnitude.
 
 ## The Self-Calibrating Algorithm
 
 The prediction model is not a static formula. Markets change. Leverage behavior shifts. New products launch. Funding rate dynamics evolve.
 
-A fixed model would decay over time. It would be accurate for a month, then drift as the market adapts. We built the algorithm to recalibrate continuously. It adjusts its projections based on live data from all supported exchanges. The model today is different from the model a week ago, because the market is different.
+A fixed model would decay over time. It would be accurate for a month, then drift as the market adapts. We built the algorithm to recalibrate continuously. The calibrator uses forceOrder events from all three backend exchanges as feedback, with soft attribution in percent-space and volatility scaling. It adjusts leverage weight distributions based on actual liquidation data. The model today is different from the model a week ago, because the market is different.
 
 This is the piece that took the longest to get right. Building a model that predicts liquidation clusters is hard. Building one that stays accurate as conditions change is significantly harder. We spent more time on the calibration system than on any other single component.
 
@@ -62,8 +58,8 @@ The liquidation prediction heatmap is the starting point. Not the endpoint.
 
 The vision for TradeNet is a terminal that gives you a structural edge across every dimension of crypto derivatives trading. Liquidation prediction was first because it is the highest-impact feature. But we are building toward a full suite: screener, volume profile, advanced OI analytics, cross-exchange correlation tools.
 
-Every feature follows the same principle. Show you what is about to happen, not what already happened. Forward-looking, not reactive.
+Every feature follows the same principle. Adapt to the market in real time, not rely on static assumptions.
 
-We are in closed beta now. The terminal is real, it works, and traders are using it daily. If you trade crypto derivatives and you are tired of looking at yesterday's data, this is what we built for you.
+We are in closed beta now. The terminal is real, it works, and traders are using it daily. If you trade crypto derivatives and you are tired of static models that do not keep up, this is what we built for you.
 
 Martin

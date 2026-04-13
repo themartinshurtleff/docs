@@ -15,7 +15,7 @@ This is how you identify support and resistance zones that actually matter. Not 
 
 ## Sqrt scaling and noise filtering
 
-Raw orderbook data is noisy. Small orders clutter the view and make it hard to spot what matters. TradeNet applies square root scaling to compress the range and bring large orders into focus without losing the smaller ones entirely. On top of that, noise filtering removes the background clutter so you see signal, not static.
+Raw orderbook data is noisy. Small orders clutter the view and make it hard to spot what matters. TradeNet applies sqrt scaling to compress the range and bring large orders into focus without losing the smaller ones entirely. Noise filtering removes the background clutter so you see signal, not static. Frames accumulate over 30 seconds, smoothing out the flicker from rapid order updates while still showing meaningful changes in book structure.
 
 ## Level outlining
 

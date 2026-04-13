@@ -5,38 +5,38 @@ description: "What is TradeNet Terminal and why it exists"
 
 # Introduction
 
-TradeNet Terminal is a native desktop trading terminal for crypto derivatives. Built in Rust. GPU-accelerated rendering via wgpu. Sub-1ms exchange latency. It aggregates order flow from Binance, Bybit, OKX, and Hyperliquid into a single interface.
+TradeNet Terminal is a native desktop trading terminal for crypto derivatives. Built in Rust with the Iced GUI framework. GPU-accelerated rendering via wgpu (the rendering backend for Iced's canvas). Sub-1ms exchange latency. It aggregates order flow from Binance, Bybit, OKX, and Hyperliquid into a single interface.
 
 Currently in closed beta (v0.8.6). Available on Windows and macOS.
 
 ## The Problem
 
-Every existing terminal shows you what already happened. Liquidation maps show past liquidations. Heatmaps show historical clusters. You are always reacting. By the time you see the data, the move is over.
+Other platforms use static liquidation models. They estimate where liquidations sit, but those models do not adapt. When market conditions shift, the model stays the same. You are trading on stale projections.
 
 That is not good enough.
 
 ## The Solution
 
-TradeNet Terminal runs a self-calibrating liquidation prediction algorithm. It does not show you where liquidations happened. It shows you where they WILL happen.
+TradeNet Terminal runs a self-calibrating liquidation prediction algorithm. It continuously adapts its leverage weight distribution using real liquidation events as feedback. Static models decay. This one stays accurate.
 
-The algorithm ingests real-time order flow from all four supported exchanges, models open interest distribution, and projects liquidation clusters before price reaches them. You see the targets. You position ahead of the move.
+The algorithm ingests real-time data from Binance, Bybit, and OKX, models open interest distribution, and projects liquidation clusters before price reaches them. A calibrator adjusts leverage weights in real time based on actual forceOrder events from all three exchanges. You see the targets. You position ahead of the move.
 
 ## Supported Exchanges
 
 - **Binance** - USDT and COIN-M perpetuals
 - **Bybit** - Linear and inverse perpetuals
 - **OKX** - USDT-M and COIN-M swaps
-- **Hyperliquid** - All listed perpetuals
+- **Hyperliquid** - All listed perpetuals (trades/orderflow only)
 
-Data streams from all exchanges simultaneously. No API keys needed for market data. The terminal handles connection management and reconnection automatically.
+The liquidation heatmap backend collects data from Binance, Bybit, and OKX via WebSocket. Hyperliquid is connected on the frontend for trades and orderflow. All data streams simultaneously. No API keys needed for market data. The terminal handles connection management and reconnection automatically.
 
 ## Tech Stack
 
 The terminal is built from scratch. No Electron. No web wrapper.
 
-- **Rust** core for performance and reliability
-- **wgpu** for GPU-accelerated chart rendering
-- **Hetzner backend** for server-side data processing and aggregation
+- **Rust + Iced GUI framework** for the native desktop frontend
+- **wgpu** as the rendering backend for Iced's canvas (GPU-accelerated charts)
+- **Python/FastAPI backend on Hetzner** for server-side data processing and aggregation
 - **Custom protocol** for compressed market data streaming
 
 Everything is optimized for speed. The rendering pipeline runs on your GPU. Data processing runs on dedicated servers. Your machine handles display. The servers handle the math.

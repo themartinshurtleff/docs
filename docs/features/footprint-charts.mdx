@@ -11,7 +11,7 @@ Real-time footprint charts aggregated across multiple exchanges. Server-side pro
 
 Footprint charts break each candle into its individual price levels and show you the buy and sell volume traded at every tick. Standard candlestick charts tell you open, high, low, close. Footprint charts tell you what actually happened inside each bar.
 
-TradeNet aggregates this data across exchanges server-side before it reaches your screen. You are not looking at one exchange. You are looking at the combined order flow.
+TradeNet aggregates this data via a dedicated aggregation server (proxy.tradenet.org/aggr) that combines trades from Binance, Bybit, OKX, and Hyperliquid before it reaches your screen. You are not looking at one exchange. You are looking at the combined order flow from four exchanges.
 
 ## Candlestick charts
 
@@ -30,14 +30,14 @@ Every bar on the chart has a stats panel with 9 rows of data:
 | Metric | What it tells you |
 |---|---|
 | Volume | Total contracts traded in the bar |
-| Delta | Net difference between market buys and market sells |
+| Buy Vol | Aggressive buy volume (market buys) |
+| Sell Vol | Aggressive sell volume (market sells) |
+| Delta | Net difference between buy vol and sell vol |
+| 24h CVD | 24-hour cumulative volume delta |
 | OI Delta | Change in open interest during the bar |
 | OI CVD | Cumulative open interest delta |
-| Liq Volume | Liquidation volume that fired in the bar |
-| Liq Count | Number of individual liquidation events |
-| Liq Delta | Net direction of liquidations (long vs short) |
-| Funding Rate | Current funding rate at bar close |
-| Additional metrics | More data points for granular analysis |
+| Short Liq | Short liquidation volume in the bar |
+| Long Liq | Long liquidation volume in the bar |
 
 Nine rows of context on every single bar. No switching tabs. No opening separate tools. It is all right there.
 

@@ -11,11 +11,15 @@ This is the core of TradeNet Terminal. A proprietary self-calibrating liquidatio
 
 The heatmap maps exactly where forced liquidations will occur before the market gets there. It continuously adapts to live market conditions. This is not a static model. It recalibrates as the market moves.
 
-Most platforms show you liquidations after they cascade. Coinglass, Market Monkey, Exocharts. They are reactive. TradeNet is predictive. You see the clusters forming before the sweep happens.
+Other platforms use static liquidation models. Coinglass, Kingfisher, Exocharts. They estimate where liquidations sit, but their models do not adapt to changing conditions. TradeNet's algorithm self-calibrates continuously using real liquidation events as feedback, adapting its leverage weight distribution to current market conditions. You see the clusters forming before the sweep happens.
 
 ## How it works
 
-The algorithm identifies price levels where leveraged positions are concentrated. It calculates the exact points where margin calls will trigger forced closures. These levels light up on the heatmap in real time, giving you a forward-looking view of where the market is likely to accelerate.
+The backend (Python/FastAPI on Hetzner) collects data from Binance, Bybit, and OKX via WebSocket. The algorithm identifies price levels where leveraged positions are concentrated and calculates the points where margin calls will trigger forced closures.
+
+The calibrator uses forceOrder events from all three exchanges as feedback, with soft attribution in percent-space and volatility scaling. This means the model adjusts its leverage weight distribution in real time based on actual liquidation data. These levels light up on the heatmap, giving you a forward-looking view of where the market is likely to accelerate.
+
+Currently supported symbols: **BTC**, **ETH**, and **SOL**.
 
 When price approaches a liquidation cluster, you know what is coming. A cascade of forced orders that will push price through that level. You position accordingly.
 

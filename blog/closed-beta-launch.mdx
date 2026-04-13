@@ -10,11 +10,11 @@ The closed beta of TradeNet Terminal is live. If you are reading this, you eithe
 
 ## What TradeNet Terminal Is
 
-TradeNet Terminal is a native desktop trading terminal for crypto derivatives. It is built in Rust with GPU-accelerated rendering. It is not a browser app. It is not an Electron wrapper. It is a proper desktop application that runs on your GPU and connects directly to exchange data streams.
+TradeNet Terminal is a native desktop trading terminal for crypto derivatives. It is built in Rust with the Iced GUI framework and GPU-accelerated rendering via wgpu. It is not a browser app. It is not an Electron wrapper. It is a proper desktop application that runs on your GPU and connects directly to exchange data streams.
 
 The terminal aggregates real-time data from Binance, Bybit, OKX, and Hyperliquid into a single interface. You get a unified view across all four exchanges without switching tabs or running multiple tools.
 
-The core feature is the liquidation prediction heatmap. A self-calibrating algorithm that shows you where liquidation clusters will form before price gets there. Not where they happened. Where they will happen. That distinction is the entire point.
+The core feature is the liquidation prediction heatmap. Other platforms use static liquidation models. TradeNet's algorithm self-calibrates continuously using real forceOrder events as feedback, adapting its leverage weight distribution to current market conditions. Static models decay. This one stays accurate. That distinction is the entire point.
 
 ## What is Included in the Beta
 
@@ -26,9 +26,9 @@ This beta ships with the full feature set we have been building toward. Nothing 
 
 **Order Book Heatmap.** Visual representation of order book depth across time. Watch how resting orders appear, move, and get pulled. Identify spoofing and real support/resistance.
 
-**Open Interest Tools.** Track OI changes in real time across all supported exchanges. See where new positions are opening and closing. Aggregated and per-exchange views.
+**Open Interest Tools.** Track OI changes in real time across Binance, Bybit, and OKX (polled every 5 seconds). See where new positions are opening and closing. Aggregated and per-exchange views.
 
-**Multi-Exchange Aggregation.** All data from all four exchanges combined into unified views. Liquidation data, volume, open interest, order flow. One terminal. Full picture.
+**Multi-Exchange Aggregation.** Charting and orderflow aggregate from all four exchanges. Liquidation heatmap and OI data pull from Binance, Bybit, and OKX. Hyperliquid is connected on the frontend for trades and orderflow. One terminal. Full picture.
 
 ## What to Expect as a Beta Tester
 

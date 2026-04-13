@@ -33,7 +33,7 @@ When new positions open, leverage changes, or funding rates shift, the algorithm
 
 This is important during volatile periods. As positions get liquidated and new ones open, the cluster map reshapes itself. The zones you saw an hour ago may look different now. The algorithm tracks all of it.
 
-Self-calibration also accounts for exchange-specific behavior. Binance liquidation mechanics differ from Bybit. OKX differs from Hyperliquid. The algorithm models each exchange separately, then aggregates the results into a single view.
+Self-calibration also accounts for exchange-specific behavior. Binance liquidation mechanics differ from Bybit, and OKX differs from both. The calibrator uses forceOrder events from all three exchanges (Binance, Bybit, OKX) as feedback, with soft attribution in percent-space and volatility scaling, then aggregates the results into a single view.
 
 ## Identifying High-Probability Sweep Zones
 
