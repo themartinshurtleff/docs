@@ -1,0 +1,36 @@
+---
+title: "Multi-Exchange Aggregation"
+description: "How TradeNet combines data from four exchanges into one view"
+---
+
+# Multi-Exchange Aggregation
+
+One exchange shows you one piece of the market. TradeNet shows you all of it.
+
+## Four exchanges, one view
+
+Data from Binance, Bybit, OKX, and Hyperliquid aggregated into a single unified view. Every chart, every metric, every data point pulls from all four sources and combines them server-side before anything reaches your screen.
+
+## 12 market pairs
+
+Twelve trading pairs supported across all four exchanges. The most traded crypto derivatives pairs, all with full aggregation and feature parity.
+
+## Sub-1ms exchange latency
+
+The server infrastructure runs on Hetzner backend with sub-1ms latency to exchange data feeds. When an order hits the book on Binance, TradeNet sees it in under a millisecond. That speed compounds across every feature. Footprint charts, orderbook heatmaps, OI data, liquidation tracking. All of it benefits from being close to the source.
+
+## Server-side processing
+
+All data aggregation and processing happens server-side. The terminal on your machine is a rendering layer. It receives clean, combined, ready-to-display data. Your browser or app is not crunching numbers from four exchange websockets. The server already did that.
+
+This is why the terminal stays fast even when markets go vertical and data volume spikes. The heavy lifting happens on infrastructure built for it, not on your laptop.
+
+## Why aggregation matters
+
+Looking at a single exchange is like reading one page of a book. You get some of the story, but you miss the rest.
+
+A large sell order on Binance might look bearish in isolation. But if Bybit and OKX are showing aggressive buying at the same time, the picture changes completely. Aggregation gives you the net signal across the entire market, not a biased slice from one venue.
+
+Consider what happens during a fast move. Liquidations fire on Bybit. Aggressive market buys pour in on Binance. OKX open interest spikes. Hyperliquid shows a cluster of new shorts opening. Each exchange tells a fragment of the story. Aggregation tells the whole thing.
+
+Single-exchange tools force you to check multiple tabs, multiple platforms, and piece it together yourself. By the time you have the full picture, the move already happened. TradeNet gives you the full picture in one place, in real time, so you can act on it while it still matters.

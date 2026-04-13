@@ -1,0 +1,42 @@
+---
+title: "Open Interest Tools"
+description: "Aggregated OI data across exchanges with delta tracking"
+---
+
+# Open Interest Tools
+
+Open interest tells you how much money is in the game. TradeNet aggregates OI across three major exchanges and gives you the tools to read what it means.
+
+## 3-Exchange aggregated OI
+
+OI data pulled from Binance, Bybit, and OKX. Combined into a single number. Looking at one exchange gives you a partial picture. Aggregating across three gives you the real one.
+
+When total OI rises, new positions are being opened. Money is entering the market. When OI drops, positions are closing. Money is leaving. The direction of OI relative to price tells you whether a move has conviction behind it.
+
+## OI Delta
+
+OI Delta shows the change in open interest over a given timeframe. Pick your interval and see exactly how much OI was added or removed in that period.
+
+A price move up with rising OI Delta means new longs are entering. A price move up with falling OI Delta means shorts are closing. Same move, completely different signal. OI Delta separates the two.
+
+## OI CVD
+
+Open Interest Cumulative Volume Delta tracks the running total of OI changes over time. Think of it as CVD but for open interest instead of trade volume.
+
+OI CVD trending up means positions are consistently being added. OI CVD trending down means positions are consistently being closed. Divergences between OI CVD and price are some of the cleanest signals you will find. If price pushes higher while OI CVD rolls over, the move is built on closing shorts, not new longs. It runs out of fuel.
+
+## Historical OI
+
+TradeNet stores historical OI data with 24-hour depth at 15-second resolution. That is 5,760 data points per day.
+
+Why does resolution matter? Because OI can shift dramatically in seconds during volatile moves. 1-minute candles miss the spike. 15-second resolution catches it. You see exactly when positions opened and closed during fast markets, not a smoothed-over approximation.
+
+## What OI tells you about positioning
+
+OI is the single best indicator of market positioning in derivatives. It answers questions that price and volume cannot:
+
+- **Are new positions being opened or old ones closing?** Rising OI on a move means fresh conviction. Falling OI means unwinding.
+- **Is the market getting crowded?** Extremely high OI relative to recent history means a lot of leverage is in play. That leverage has to unwind at some point.
+- **Where is the fuel for the next move?** High OI means high liquidation potential. Combine OI levels with the liquidation heatmap and you know exactly where the powder keg sits.
+
+Track OI changes alongside price action and you will read the market with far more accuracy than price alone can offer.

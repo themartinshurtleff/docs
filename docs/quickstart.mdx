@@ -1,0 +1,64 @@
+---
+title: "Quick Start"
+description: "Get up and running with TradeNet Terminal in under 5 minutes"
+---
+
+# Quick Start
+
+This guide gets you from first launch to a working chart with liquidation data in under 5 minutes.
+
+## Step 1: Launch the Terminal
+
+Open TradeNet Terminal from your Applications folder (macOS) or Start Menu (Windows). The first launch takes a few extra seconds while the terminal initializes local config files.
+
+## Step 2: Sign In
+
+Enter your TradeNet account email and password. This is the same account you used to join the waitlist. If you do not have an account yet, you need waitlist approval first. See the [Installation](/docs/installation) guide.
+
+## Step 3: Select a Symbol
+
+The symbol picker is in the top-left corner. Type a symbol name or scroll the list. Start with one of these:
+
+- **BTCUSDT** - Most liquid. Best for learning the interface.
+- **ETHUSDT** - High volume. Clean order flow.
+- **SOLUSDT** - More volatile. Good for spotting liquidation cascades.
+
+Select a symbol. Data starts streaming immediately from all four exchanges (Binance, Bybit, OKX, Hyperliquid). No API keys needed. No configuration required.
+
+## Step 4: Set Up Your Chart Layout
+
+The default layout gives you a single chart. You can split it.
+
+1. Right-click the chart area.
+2. Select **Split Horizontal** or **Split Vertical**.
+3. Assign a different symbol or timeframe to each panel.
+
+Drag panel edges to resize. Double-click an edge to reset to equal splits. Layouts auto-save when you close the terminal.
+
+## Step 5: Enable the Liquidation Heatmap
+
+This is the core feature. Turn it on.
+
+1. Click the **Layers** icon in the chart toolbar (right side).
+2. Toggle **Liquidation Heatmap** to on.
+3. The heatmap renders directly on your chart as colored zones.
+
+Bright zones indicate high predicted liquidation density. These are the price levels where cascading liquidations are most likely to trigger. The algorithm updates in real time as order flow changes.
+
+## What You Should See
+
+Your chart now shows:
+
+- **Price action** from aggregated exchange data
+- **Liquidation zones** overlaid as colored regions
+- **Real-time updates** as new order flow data arrives
+
+The heatmap shifts as positions open and close across exchanges. Watch how liquidation clusters form above and below the current price. These clusters are targets.
+
+## Next Steps
+
+You are up and running. From here:
+
+- Explore the **Order Flow** panel for real-time trade data
+- Check the **Open Interest** tab for position sizing across exchanges
+- Read the [Liquidation Heatmap](/docs/features/liquidation-heatmap) docs to understand the prediction model

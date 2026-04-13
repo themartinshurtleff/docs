@@ -1,0 +1,91 @@
+---
+title: "Reading the Liquidation Heatmap"
+description: "How to interpret the heatmap and use it in your trading"
+---
+
+# Reading the Liquidation Heatmap
+
+The heatmap is the core feature of TradeNet Terminal. It shows you where liquidations will cluster before price gets there. This guide covers how to read it and turn that information into trades.
+
+## Understanding the Colors
+
+The heatmap uses a color intensity scale. Brighter colors mean denser liquidation clusters. Dim zones have scattered positions. Hot zones have stacked leverage.
+
+- **Cool tones (blue/purple)** indicate low-density areas. Some positions exist here, but a sweep through this level would not trigger much forced flow.
+- **Warm tones (yellow/orange)** indicate moderate density. Enough positions are stacked here that a sweep would generate noticeable forced order flow.
+- **Hot tones (bright white/red)** indicate high-density clusters. These are the levels where a sweep will trigger cascading liquidations. This is where the real moves happen.
+
+The color does not represent a single liquidation. It represents the predicted density of liquidation events at that price level. Think of it as a heat signature of leveraged exposure.
+
+## Long vs Short Liquidation Clusters
+
+Clusters above current price are **short liquidation zones**. If price pushes up into these levels, shorts get stopped out and liquidated. Forced buy orders accelerate the move higher.
+
+Clusters below current price are **long liquidation zones**. If price drops into these levels, longs get liquidated. Forced sell orders accelerate the move lower.
+
+This distinction matters. A bright cluster above price is fuel for a short squeeze. A bright cluster below price is fuel for a long squeeze. The heatmap shows you both sides of the setup at all times.
+
+## How the Algorithm Self-Calibrates
+
+The prediction model is not static. It recalibrates continuously as the market moves.
+
+When new positions open, leverage changes, or funding rates shift, the algorithm adjusts its cluster projections in real time. You do not need to refresh anything. The heatmap updates automatically.
+
+This is important during volatile periods. As positions get liquidated and new ones open, the cluster map reshapes itself. The zones you saw an hour ago may look different now. The algorithm tracks all of it.
+
+Self-calibration also accounts for exchange-specific behavior. Binance liquidation mechanics differ from Bybit. OKX differs from Hyperliquid. The algorithm models each exchange separately, then aggregates the results into a single view.
+
+## Identifying High-Probability Sweep Zones
+
+Not all clusters are equal. Here is what makes a zone high-probability:
+
+1. **Intensity.** Brighter zones hold more stacked leverage. More fuel for the move.
+2. **Proximity to price.** Clusters close to current price are more likely to get swept than distant ones.
+3. **Isolation.** A single bright cluster with empty space around it is a cleaner target. Price tends to sweep through and reverse. Stacked clusters over a wide range suggest a trending move.
+4. **Persistence.** Clusters that stay bright over time are more reliable than ones that flash and fade. Persistent clusters mean traders are holding those positions, not closing them.
+
+Watch for zones where multiple factors align. A bright, persistent cluster sitting just above a consolidation range is a high-probability target.
+
+## Basic Trading Workflow
+
+Here is a simple workflow for using the heatmap in your trading:
+
+### Step 1: Identify clusters above and below price
+
+Open the heatmap and note where the brightest zones sit relative to current price. Are there more longs stacked below or shorts stacked above? This tells you where the market is leaning.
+
+### Step 2: Determine the nearest high-probability zone
+
+Find the closest bright cluster to current price. This is the most likely near-term target. Price tends to gravitate toward liquidity.
+
+### Step 3: Wait for price to approach
+
+Do not front-run the cluster from far away. Wait for price to move toward the zone. As it approaches, watch for acceleration. Liquidation cascades create momentum. You want to be positioned before the cascade starts, not before price even begins moving.
+
+### Step 4: Watch for confirmation
+
+Confirmation signals that price is about to sweep the cluster:
+
+- Increasing pace of price movement toward the zone
+- Rising volume as price nears the cluster
+- Funding rate divergence (extreme funding rates increase liquidation probability)
+- Order book thinning on the side facing the cluster
+
+### Step 5: Manage the position
+
+Liquidation sweeps are fast. Price blows through the cluster, absorbs the forced orders, and often reverses. If you are trading the sweep, have your take-profit levels ready. If you are trading the reversal after the sweep, wait for the cluster to deplete on the heatmap before entering.
+
+## Common Patterns
+
+**The magnet.** Price consolidates near a bright cluster, then sweeps through it. The cluster acts as a magnet pulling price toward it.
+
+**The double sweep.** Clusters exist on both sides of price. The market sweeps one side, reverses, then sweeps the other. This is common in ranging markets with high leverage on both sides.
+
+**The cascade chain.** Multiple clusters are stacked at increasing distances from price. As each one gets swept, the forced orders push price into the next cluster. This creates an extended move with multiple acceleration points.
+
+## Tips
+
+- Check the heatmap before every trade. Know where the clusters sit.
+- Do not trade against a bright cluster directly in front of price. The sweep is more powerful than your stop loss.
+- Use the heatmap alongside the footprint chart and order book data. Clusters tell you WHERE the move will happen. Order flow tells you WHEN.
+- Revisit the heatmap after major moves. The self-calibration will have reshaped the cluster map. Old zones may be depleted. New zones may have formed.

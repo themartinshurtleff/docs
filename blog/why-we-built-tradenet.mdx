@@ -1,0 +1,69 @@
+---
+title: "Why We Built TradeNet Terminal"
+description: "The story behind the terminal and why existing tools weren't good enough."
+date: "2026-03-15"
+---
+
+# Why We Built TradeNet Terminal
+
+I want to explain why this thing exists. Not the marketing pitch. The actual reason.
+
+## The Frustration
+
+I have been trading crypto derivatives for years. And every single tool available to me had the same fundamental problem: it showed me what already happened.
+
+Coinglass shows you liquidation data. After the liquidations fire. You see a spike on the chart and think "wow, that was a big liquidation event." Great. The move is done. The opportunity is gone. You are reading the newspaper.
+
+Market Monkey shows historical heatmaps. Same problem. You can look at where clusters were. Past tense. By the time you are studying the heatmap, the market has already swept those levels and moved on.
+
+Exocharts, Kingfisher, every tool I tried. All reactive. All backward-looking. All showing you the aftermath instead of the setup.
+
+I got tired of showing up late to every move.
+
+## The Question That Started Everything
+
+What if you could see where liquidation clusters would form before price got there?
+
+Not where they happened. Where they WILL happen. If you can model open interest distribution across exchanges, track leverage ratios, and project where margin calls will trigger, you can build a map of future liquidation events. Not a guess. A probabilistic model that calibrates itself against live data.
+
+That is the idea. Simple to state. Hard to build. But that is what we set out to do.
+
+## Why It Had to Be a Desktop App
+
+The first decision was the tech stack. And the answer was obvious to me: this could not be a web app.
+
+Browser-based charting tools hit a ceiling fast. Canvas rendering is slow. WebSocket connections are fragile. Memory management is a constant fight. Every existing terminal runs in a browser or wraps one in Electron. And they all feel like it. Sluggish charts. Laggy data. Frozen tabs when the market spikes.
+
+We built TradeNet in Rust. The rendering pipeline uses wgpu for GPU acceleration. Charts render on your graphics card, not your CPU. Data processing runs on dedicated backend servers. Your machine handles display. The servers handle the math.
+
+The result is a terminal that stays smooth when every browser-based tool locks up. During a volatility spike, when data throughput increases tenfold, the terminal does not skip a frame. That is not a nice-to-have. When the market is moving fast, that is exactly when you need your tools to work.
+
+Rust was the right choice for another reason: reliability. No garbage collector pauses. No memory leaks over time. The terminal runs the same at hour one as it does at hour twelve. If you run a browser terminal for a full trading session, you know what I mean. Eventually it starts crawling.
+
+## Multi-Exchange Aggregation
+
+Crypto liquidity is fragmented. A liquidation cascade on Binance affects Bybit pricing. OI changes on OKX ripple through Hyperliquid. If you are only watching one exchange, you are seeing a fraction of the picture.
+
+TradeNet aggregates data from Binance, Bybit, OKX, and Hyperliquid simultaneously. The liquidation prediction model ingests all four streams. The heatmap reflects the full market, not one exchange's slice of it.
+
+This matters more than most people realize. A liquidation cluster that looks small on Binance alone might be massive when you combine all four exchanges. The aggregated view shows you the real magnitude.
+
+## The Self-Calibrating Algorithm
+
+The prediction model is not a static formula. Markets change. Leverage behavior shifts. New products launch. Funding rate dynamics evolve.
+
+A fixed model would decay over time. It would be accurate for a month, then drift as the market adapts. We built the algorithm to recalibrate continuously. It adjusts its projections based on live data from all supported exchanges. The model today is different from the model a week ago, because the market is different.
+
+This is the piece that took the longest to get right. Building a model that predicts liquidation clusters is hard. Building one that stays accurate as conditions change is significantly harder. We spent more time on the calibration system than on any other single component.
+
+## Where This Goes
+
+The liquidation prediction heatmap is the starting point. Not the endpoint.
+
+The vision for TradeNet is a terminal that gives you a structural edge across every dimension of crypto derivatives trading. Liquidation prediction was first because it is the highest-impact feature. But we are building toward a full suite: screener, volume profile, advanced OI analytics, cross-exchange correlation tools.
+
+Every feature follows the same principle. Show you what is about to happen, not what already happened. Forward-looking, not reactive.
+
+We are in closed beta now. The terminal is real, it works, and traders are using it daily. If you trade crypto derivatives and you are tired of looking at yesterday's data, this is what we built for you.
+
+Martin

@@ -1,0 +1,37 @@
+---
+title: "Liquidation Prediction Heatmap"
+description: "How the self-calibrating liquidation prediction algorithm works"
+---
+
+# Liquidation Prediction Heatmap
+
+This is the core of TradeNet Terminal. A proprietary self-calibrating liquidation prediction algorithm rendered as a real-time heatmap.
+
+## What it does
+
+The heatmap maps exactly where forced liquidations will occur before the market gets there. It continuously adapts to live market conditions. This is not a static model. It recalibrates as the market moves.
+
+Most platforms show you liquidations after they cascade. Coinglass, Market Monkey, Exocharts. They are reactive. TradeNet is predictive. You see the clusters forming before the sweep happens.
+
+## How it works
+
+The algorithm identifies price levels where leveraged positions are concentrated. It calculates the exact points where margin calls will trigger forced closures. These levels light up on the heatmap in real time, giving you a forward-looking view of where the market is likely to accelerate.
+
+When price approaches a liquidation cluster, you know what is coming. A cascade of forced orders that will push price through that level. You position accordingly.
+
+## Validated in live markets
+
+On February 28, during the Iran strike, the algorithm identified exact liquidation clusters hours before 2,623 force orders swept through them. Traders watching the heatmap saw the setup forming well before the cascade hit. That is the difference between predicting and reacting.
+
+## Additional liquidation tools
+
+The heatmap is the flagship, but the liquidation suite includes several other components:
+
+- **Historical liquidation heatmap.** Look back at where liquidations occurred on past price action. Study how clusters formed and resolved.
+- **Liquidation bubbles overlay.** Plots liquidation events directly on your candlestick chart. See exactly when and where force orders fired.
+- **Liq event streaming with deduplication.** A raw feed of liquidation events cleaned of duplicate reports across exchanges. No double-counting.
+- **Swept zone visual persistence.** When a liquidation cluster gets swept, the zone stays visible on the chart. You can see which levels have already been cleared and which remain loaded.
+
+## Why this matters
+
+Liquidation cascades are the highest-impact events in crypto markets. They move price faster and further than organic order flow. Knowing where they sit before they fire gives you a structural edge that no amount of technical analysis can replicate.

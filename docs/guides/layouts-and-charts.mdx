@@ -1,0 +1,103 @@
+---
+title: "Layouts and Charts"
+description: "How to set up and customize your workspace"
+---
+
+# Layouts and Charts
+
+TradeNet Terminal lets you build your workspace the way you want it. Multiple charts, custom arrangements, saved layouts. Here is how to set it up.
+
+## Creating a Layout
+
+A layout is a saved workspace configuration. It stores your chart arrangement, selected symbols, timeframes, and any indicators or overlays you have active.
+
+To create a new layout:
+
+1. Click the **Layout** menu in the top toolbar.
+2. Select **New Layout**.
+3. Give it a name. Use something descriptive. "BTC Scalping" is better than "Layout 1".
+
+Your layout starts with a single chart. You can add more from here.
+
+## Adding Charts
+
+You can run multiple charts in a single layout. Each chart operates independently with its own symbol, timeframe, and overlays.
+
+To add a chart:
+
+1. Click the **+** button in the layout toolbar.
+2. Choose the chart type (candlestick, footprint, heatmap, etc.).
+3. The new chart appears in your workspace.
+
+Each chart renders on the GPU independently. Adding charts does not degrade performance the way browser-based terminals do. The rendering pipeline handles it.
+
+## Arranging Your Workspace
+
+Drag charts to rearrange them. Resize by pulling the edges or dividers between panels.
+
+Common setups:
+
+- **Two-panel.** Heatmap on the left, candlestick chart on the right. Both on the same symbol. The heatmap shows you the target. The candlestick shows you the price action getting there.
+- **Three-panel.** Heatmap, candlestick, and order book side by side. Full context for execution.
+- **Multi-symbol.** BTC, ETH, and SOL charts stacked. Watch correlations and divergences in real time.
+- **Multi-timeframe.** Same symbol on 1m, 5m, and 1h. Drill down from macro to micro without switching tabs.
+
+There is no fixed grid. Place charts wherever they make sense for your workflow.
+
+## Switching Symbols
+
+To change the symbol on a chart:
+
+1. Click the **symbol selector** at the top of the chart.
+2. Type or search for the symbol you want (e.g., BTCUSDT, ETHUSDT).
+3. Select the exchange or view aggregated data across all supported exchanges.
+
+Symbol changes are instant. The chart pulls data from the server and renders immediately. No loading screens.
+
+## Switching Timeframes
+
+Click the timeframe selector on the chart toolbar. Available timeframes range from 1s tick charts to monthly candles. The chart reloads with the new timeframe in place.
+
+You can also use keyboard shortcuts:
+
+- **1** through **9** for minute-based timeframes
+- **H** for hourly
+- **D** for daily
+- **W** for weekly
+
+## Saving and Loading Layouts
+
+Layouts save automatically as you make changes. You can also manually save with **Ctrl+S** (Windows) or **Cmd+S** (macOS).
+
+To load a saved layout:
+
+1. Click the **Layout** menu.
+2. Select the layout you want from the list.
+3. Your workspace switches instantly.
+
+Layouts are synced to your account. Switch machines and your workspace follows you.
+
+## Layout Limits
+
+- **Free plan:** 1 saved layout. You can modify it as much as you want, but you cannot save multiple configurations.
+- **Pro plan:** Unlimited saved layouts. Build different workspaces for different strategies, symbols, or market conditions. Switch between them as needed.
+
+If you are on the free plan and need more than one layout, upgrading to Pro unlocks this along with all other Pro features.
+
+## Chart Settings
+
+Each chart has its own settings panel. Right-click the chart or click the gear icon to access:
+
+- **Colors.** Customize candle colors, background, grid lines, and overlay colors.
+- **Overlays.** Toggle liquidation bubbles, volume profile, funding rate, and other data overlays.
+- **Scale.** Switch between linear and logarithmic price scale.
+- **Crosshair.** Configure crosshair behavior and displayed data.
+
+Settings are saved per chart within your layout. Each chart can look and behave differently.
+
+## Tips
+
+- Set up one layout for each strategy you trade. Keep them focused. A scalping layout does not need weekly charts.
+- Put the heatmap where you can always see it. It is the highest-signal tool in the terminal.
+- Use the multi-timeframe setup when you are unsure about direction. Higher timeframes show the structure. Lower timeframes show the entry.
+- Name your layouts clearly. You will build more of them than you expect.

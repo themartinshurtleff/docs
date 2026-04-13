@@ -1,0 +1,46 @@
+---
+title: "Footprint Charts"
+description: "Real-time multi-exchange aggregated footprint charts"
+---
+
+# Footprint Charts
+
+Real-time footprint charts aggregated across multiple exchanges. Server-side processing. Roughly 300ms load time.
+
+## What you get
+
+Footprint charts break each candle into its individual price levels and show you the buy and sell volume traded at every tick. Standard candlestick charts tell you open, high, low, close. Footprint charts tell you what actually happened inside each bar.
+
+TradeNet aggregates this data across exchanges server-side before it reaches your screen. You are not looking at one exchange. You are looking at the combined order flow.
+
+## Candlestick charts
+
+Full candlestick charting with custom timeframes. Pick standard intervals or set your own. The chart engine is built for speed. No lag, no waiting for candles to populate.
+
+## Aggregated CVD
+
+Cumulative Volume Delta tracks the running difference between aggressive buying and aggressive selling. TradeNet aggregates CVD across exchanges so you see the true net aggression, not just what is happening on Binance or Bybit alone.
+
+When CVD diverges from price, pay attention. That divergence often signals that the move is running out of fuel.
+
+## Bar stats panel
+
+Every bar on the chart has a stats panel with 9 rows of data:
+
+| Metric | What it tells you |
+|---|---|
+| Volume | Total contracts traded in the bar |
+| Delta | Net difference between market buys and market sells |
+| OI Delta | Change in open interest during the bar |
+| OI CVD | Cumulative open interest delta |
+| Liq Volume | Liquidation volume that fired in the bar |
+| Liq Count | Number of individual liquidation events |
+| Liq Delta | Net direction of liquidations (long vs short) |
+| Funding Rate | Current funding rate at bar close |
+| Additional metrics | More data points for granular analysis |
+
+Nine rows of context on every single bar. No switching tabs. No opening separate tools. It is all right there.
+
+## Volume Profile
+
+Volume Profile is coming post-launch. It will show volume distribution across price levels for any time range, giving you a clear picture of where the market has spent the most time and traded the most size.
