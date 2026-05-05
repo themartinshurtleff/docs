@@ -1,0 +1,138 @@
+---
+title: "Connect Your Bitunix Account"
+description: "Set up API keys to enable native trade execution through TradeNet Terminal"
+---
+
+## Why Connect Bitunix?
+
+TradeNet Terminal can place trades on Bitunix directly from inside the terminal. No copy-pasting between windows. No switching tabs during a trade. You connect your account by creating API keys in Bitunix and pasting them into the terminal. Your keys are stored locally on your device only. TradeNet servers never see them.
+
+## Before You Start
+
+You'll need:
+
+- **A Bitunix account.** Don't have one? [Sign up here](https://www.bitunix.com/register?vipCode=terminal) (this is our referral link, but it doesn't affect your fees or experience).
+- **2FA enabled on your Bitunix account.** Bitunix requires this before you can create API keys. If you haven't set it up, go to Security Settings in your Bitunix account first.
+- **A desktop or laptop computer.** This guide covers the web dashboard. Mobile steps may differ slightly.
+
+## Step 1: Log Into Bitunix
+
+Go to [bitunix.com](https://www.bitunix.com) and sign in with your account credentials.
+
+{/* [IMAGE: bitunix-login-page.png] */}
+{/* Caption: The Bitunix login page. Sign in with your email and password. */}
+
+## Step 2: Open API Management
+
+Click your account icon in the top-right corner, then select **API Management**. Or go directly to:
+
+[https://www.bitunix.com/account-setting/api-management](https://www.bitunix.com/account-setting/api-management)
+
+{/* [IMAGE: bitunix-api-management-page.png] */}
+{/* Caption: The API Management page in your Bitunix account settings. */}
+
+## Step 3: Create a New API Key
+
+Click **Create API**. Give your key a name you'll recognize later, like `TradeNet Terminal`.
+
+{/* [IMAGE: bitunix-create-api-button.png] */}
+{/* Caption: Click "Create API" to start the key creation process. */}
+
+## Step 4: Set Permissions
+
+This is the most important step.
+
+<Warning>
+**Permission settings matter. Get this right.**
+
+- **Enable: Trading** - This lets TradeNet place orders on your behalf.
+- **Do NOT enable: Withdraw** - This would let any software with these keys move money out of your account. You never need Withdraw for trading.
+- **Read-only access** is included automatically when you enable Trading. You don't need to toggle it separately.
+
+Trading lets TradeNet place and cancel orders. That's all it needs. Withdraw would let any app with these keys take funds out of your account. There is zero reason to enable it.
+</Warning>
+
+{/* [IMAGE: bitunix-api-permissions.png] */}
+{/* Caption: Enable "Trading" only. Leave "Withdraw" unchecked. */}
+
+## Step 5: Leave IP Whitelist Blank
+
+Bitunix may offer an IP whitelist option. **Leave it blank.**
+
+Your home internet IP can change without warning. If you whitelist your current IP and it changes later, TradeNet will stop working until you manually update it in Bitunix. Leaving the whitelist blank is standard practice for desktop trading apps.
+
+## Step 6: Complete Verification
+
+Bitunix will prompt you to verify via email and/or 2FA. Complete whatever verification steps they show you.
+
+## Step 7: Copy Your Keys
+
+After verification, Bitunix displays two values:
+
+- **API Key** (also called "Access Key")
+- **Secret Key**
+
+<Warning>
+**The Secret Key is shown exactly once.** Copy it immediately and store it somewhere safe. If you close this page without copying it, you'll need to delete this key and create a new one. There is no way to retrieve it later.
+</Warning>
+
+Copy both values. You'll paste them into TradeNet Terminal in the next step.
+
+{/* [IMAGE: bitunix-api-key-created.png] */}
+{/* Caption: Your API Key and Secret Key. Copy both before closing this page. */}
+
+## Step 8: Connect in TradeNet Terminal
+
+1. Open TradeNet Terminal
+2. Click the trade icon in the sidebar
+3. Paste your **API Key** in the first field
+4. Paste your **Secret Key** in the second field
+5. Click **Connect**
+
+The terminal will validate your keys by fetching your account balance. If it succeeds, you're connected and ready to trade. If it fails, check the troubleshooting section below.
+
+{/* [IMAGE: tradenet-connect-dialog.png] */}
+{/* Caption: The connection dialog in TradeNet Terminal. Paste your keys and click Connect. */}
+
+## Security
+
+<Note>
+**How your keys are protected:**
+
+- Your API keys are stored in your operating system's secure credential store (Windows Credential Manager, macOS Keychain, or Linux Secret Service). They are not stored in plain text files.
+- TradeNet servers never receive your keys. All trading requests go directly from your computer to Bitunix.
+- You can disconnect at any time using the **Disconnect** button inside the terminal. This wipes the keys from your device.
+- To fully revoke access, also delete the API key in Bitunix's API Management page.
+- **If you suspect your keys are compromised:** delete the key in Bitunix immediately at [bitunix.com/account-setting/api-management](https://www.bitunix.com/account-setting/api-management), then create a new one.
+</Note>
+
+## Troubleshooting
+
+**"Invalid credentials"**
+Double-check you pasted the correct API Key and Secret Key. Make sure there are no extra spaces before or after either value. The most common cause is an accidental space character at the end of the secret.
+
+**"Insufficient permissions"**
+The Trading permission wasn't enabled when you created the key. Go to Bitunix API Management, edit the key to add Trading, or delete it and create a new one with the correct permissions.
+
+**"IP not allowed"**
+You set an IP whitelist that doesn't include your current IP address. Go to Bitunix API Management, edit the key, and remove the IP whitelist entirely.
+
+**"Network error"**
+Check your internet connection and try again. If the problem persists, Bitunix's API might be temporarily down. Wait a few minutes and retry.
+
+**Keys were just created but validation fails**
+New API keys sometimes take up to 30 seconds to propagate on Bitunix's side. Wait a moment and try connecting again.
+
+## FAQ
+
+**Is this safe?**
+Yes. Your keys are stored in your operating system's encrypted credential store, not in a plain text file. TradeNet servers never see your keys. All trades go directly from your machine to Bitunix. And because you only enable the Trading permission (not Withdraw), the keys can only place orders. They cannot move funds out of your account.
+
+**Why do I need to create keys manually?**
+Bitunix doesn't offer a "Sign in with Bitunix" option like some other services. Manual API key creation is the only way to grant external applications trading access. This is standard across the industry for exchange integrations.
+
+**Will my Bitunix affiliate referral still work?**
+Yes. Fee discounts and referral benefits are tied to your account UID, not to how you place trades. Orders placed through the API use the same fee structure as orders placed on the Bitunix website.
+
+**Can I use the same API key on multiple devices?**
+Yes, it will work. But creating a separate key per device is more secure. If one device is compromised, you can revoke just that key without affecting the others.

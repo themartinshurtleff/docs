@@ -37,6 +37,12 @@
               "docs/guides/reading-the-heatmap",
               "docs/guides/layouts-and-charts"
             ]
+          },
+          {
+            "group": "Integrations",
+            "pages": [
+              "docs/integrations/bitunix-connect"
+            ]
           }
         ]
       },
