@@ -26,7 +26,7 @@ Go to [bitunix.com](https://www.bitunix.com) and sign in with your account crede
 
 Click your account icon in the top-right corner, then select **API Management**. Or go directly to:
 
-[https://www.bitunix.com/account-setting/api-management](https://www.bitunix.com/account-setting/api-management)
+[https://www.bitunix.com/account/api-management](https://www.bitunix.com/account/api-management)
 
 {/* [IMAGE: bitunix-api-management-page.png] */}
 {/* Caption: The API Management page in your Bitunix account settings. */}
@@ -45,11 +45,10 @@ This is the most important step.
 <Warning>
 **Permission settings matter. Get this right.**
 
-- **Enable: Trading** - This lets TradeNet place orders on your behalf.
-- **Do NOT enable: Withdraw** - This would let any software with these keys move money out of your account. You never need Withdraw for trading.
-- **Read-only access** is included automatically when you enable Trading. You don't need to toggle it separately.
+You'll see a **Permission** dropdown with two options: **Trade** and **Withdrawal**. Select **Trade**. Do not select Withdrawal.
 
-Trading lets TradeNet place and cancel orders. That's all it needs. Withdraw would let any app with these keys take funds out of your account. There is zero reason to enable it.
+- **Select: Trade** - This lets TradeNet place and cancel orders on your behalf. That's all it needs.
+- **Do NOT select: Withdrawal** - This would let any software with these keys move funds out of your account. There is zero reason to enable it for trading.
 </Warning>
 
 {/* [IMAGE: bitunix-api-permissions.png] */}
@@ -61,9 +60,9 @@ Bitunix may offer an IP whitelist option. **Leave it blank.**
 
 Your home internet IP can change without warning. If you whitelist your current IP and it changes later, TradeNet will stop working until you manually update it in Bitunix. Leaving the whitelist blank is standard practice for desktop trading apps.
 
-## Step 6: Complete Verification
+## Step 6: Complete Security Verification
 
-Bitunix will prompt you to verify via email and/or 2FA. Complete whatever verification steps they show you.
+At the bottom of the key creation form, Bitunix will ask you to complete a security verification. If you have 2FA enabled (which is required for API key creation), you'll need to enter your 2FA code here along with any other verification Bitunix prompts, such as an email confirmation code. Complete all verification steps to finalize the key.
 
 ## Step 7: Copy Your Keys
 
@@ -103,7 +102,7 @@ The terminal will validate your keys by fetching your account balance. If it suc
 - TradeNet servers never receive your keys. All trading requests go directly from your computer to Bitunix.
 - You can disconnect at any time using the **Disconnect** button inside the terminal. This wipes the keys from your device.
 - To fully revoke access, also delete the API key in Bitunix's API Management page.
-- **If you suspect your keys are compromised:** delete the key in Bitunix immediately at [bitunix.com/account-setting/api-management](https://www.bitunix.com/account-setting/api-management), then create a new one.
+- **If you suspect your keys are compromised:** delete the key in Bitunix immediately at [bitunix.com/account-setting/api-management](https://www.bitunix.com/account/api-management), then create a new one.
 </Note>
 
 ## Troubleshooting
