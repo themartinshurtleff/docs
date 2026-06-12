@@ -46,6 +46,38 @@ This is how you tell which levels have already been cleared and which are still 
 
 On February 28, during the Iran strike, the algorithm identified exact liquidation clusters hours before 2,623 force orders swept through them. Traders watching the heatmap saw the setup forming well before the cascade hit. That is the difference between predicting and reacting.
 
+## Impact levels
+
+The heatmap shows everything the model projects. Most of it is mist: small, diffuse liquidation volume that paints useful context but is not individually tradeable. Impact levels cut through the mist. They are the discrete levels most likely to actually matter as support or resistance, scored by a dedicated model and drawn as bright bands over the heatmap.
+
+### How a level earns its score
+
+The terminal tracks every significant level from the moment it forms: how large it is, whether real liquidation prints confirm the projection near that price, how it stands out against the background, and how far it sits from price. A model trained on thousands of archived level lifecycles turns those properties into a single **impact score** between 0 and 1: the probability that price reaching this level produces a real reaction, not just a touch.
+
+The score is calibrated against measured outcomes, not vibes. In training, levels at the bottom of the scale produced a meaningful reaction roughly 1 time in 10. Levels near the top reacted roughly 3 times in 4.
+
+### What you see
+
+- **Impact 0.6 and above**: a bright band in the side's color with a near-white core line. These are the levels to plan around.
+- **Impact 0.4 to 0.6**: a subtle tinted band. Worth watching, weaker conviction.
+- **Below 0.4**: stays in the mist. Context, not a level.
+
+Bands draw as horizontal rays from the moment the level started resting to the live edge of the chart, so the length of a band tells you honestly how long that level has been sitting there. Up to 12 levels per side are scored, refreshed about every 5 seconds.
+
+Hover any band for the full readout: side, price, age, whether real liquidation prints confirm it (dual-source), its modeled size (shown as approximate, because it is a model estimate, not a resting order), the impact score, and a live accuracy line showing how often similar levels were actually reached. That accuracy number comes from the terminal's own running ledger, measured continuously in production.
+
+### Honesty rules
+
+The model scores current levels only, and the terminal refuses to show you stale data:
+
+- If the live feed is more than 30 seconds old, bands are withheld until it recovers.
+- After a backend restart, impact levels take a few minutes to reappear while the level tracker warms up.
+- Scores above roughly 0.7 should be read as "very likely to be tested," not strictly ranked against each other. Ultra-close levels almost always get touched but can coin-flip the reaction, so the terminal deliberately avoids showing a ranked leaderboard.
+
+<Note>
+Impact bands have a per-pane toggle, **Impact S/R levels (model)**, in the liquidation heatmap settings. It is on by default. Custom indicators can read the same levels through `ctx.liq_impact_levels()`, see the [Lua Scripting Reference](/docs/indicators/scripting-reference).
+</Note>
+
 ## Additional liquidation tools
 
 The heatmap is the flagship, but the liquidation suite includes more:
@@ -53,10 +85,6 @@ The heatmap is the flagship, but the liquidation suite includes more:
 - **Historical liquidation heatmap.** Look back at where liquidations occurred on past price action. Study how clusters formed and resolved.
 - **Liquidation bubbles overlay.** Plots liquidation events directly on your candlestick chart. See exactly when and where force orders fired.
 - **Deduplicated liquidation stream.** Events from Binance, Bybit, and OKX, normalized into one clean feed. No double-counting across exchanges.
-
-<Note>
-An impact scoring upgrade is rolling out. Each level will get a score for how likely it is to be swept within 4, 12, or 24 hours.
-</Note>
 
 ## Why this matters
 

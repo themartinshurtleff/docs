@@ -91,6 +91,26 @@ end
 ```
 </Warning>
 
+## Liquidation impact levels
+
+Live-only tap into the model-scored significant levels shown as impact bands on the liquidation heatmap. See [Impact levels](/docs/features/liquidation-heatmap#impact-levels) for what the score means.
+
+| Member | Returns |
+|--------|---------|
+| `ctx.liq_impact_levels()` | Table or `nil` |
+
+Returns a 0-indexed table of levels plus two extra fields, or `nil` when the pane has no liquidation layer:
+
+- Each level: `{ price, side, usd, peak_usd, impact, dual_source, isolation, size_percentile, distance_pct, age_min }`. `side` is `"long"` or `"short"`. `impact` is a model probability from 0 to 1.
+- `count`: number of levels in the table.
+- `touch_rate`: live measured accuracy from the level ledger (0 to 1), or `nil` while warming up.
+
+Up to 12 levels per side, sorted by impact descending.
+
+<Warning>
+Honesty rules carry into Lua. The table is empty when the live snapshot is stale (older than 30 seconds), during backend warm-up after a restart, or on panes without backend liquidation data (per-exchange panes typically have none, aggregated BTC/ETH/SOL are the home of this data). `usd` is a model estimate, label it as modeled, never as exact resting size. Do not rank-compare scores above roughly 0.7, calibration flattens for ultra-close levels.
+</Warning>
+
 ## Bulk series
 
 Each call returns a fresh Lua table. Call once and reuse, do not call inside loops.

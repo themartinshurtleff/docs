@@ -119,6 +119,16 @@ if fp then
 end
 ```
 
+### Liquidation impact levels (live-only)
+
+- `ctx.liq_impact_levels()` -> table or nil. nil when the pane has no liquidation layer (per-exchange panes typically have none; aggregated BTC/ETH/SOL panes have it).
+- Returns a 0-indexed table of model-scored significant liquidation levels. Each level: `{ price, side, usd, peak_usd, impact, dual_source, isolation, size_percentile, distance_pct, age_min }`. `side` is "long" or "short". `impact` is a model probability 0 to 1.
+- Extra fields on the same table: `count` (number of levels) and `touch_rate` (live measured accuracy 0 to 1, or nil while warming up).
+- Up to 12 levels per side, sorted by impact descending. Iterate with a while loop on numeric indices, not ipairs.
+- The table is EMPTY (count 0) when the live snapshot is stale (>30s old) or during backend warm-up. Handle the empty case.
+- This is live-state data, not per-candle history. It describes current levels only. Do not try to plot it across historical candles.
+- `usd` is a model estimate. If you display it, label it as modeled/approximate, never as exact resting size.
+
 ### Bulk series
 
 - `ctx.closes()`, `ctx.highs()`, `ctx.lows()`, `ctx.opens()`, `ctx.volumes()`, `ctx.deltas()`

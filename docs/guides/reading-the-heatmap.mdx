@@ -53,10 +53,28 @@ Not all clusters are equal. Here is what makes a zone high-probability:
 
 1. **Intensity.** Brighter zones hold more stacked leverage. More fuel for the move.
 2. **Proximity to price.** Clusters close to current price are more likely to get swept than distant ones.
-3. **Isolation.** A single bright cluster with empty space around it is a cleaner target. Price tends to sweep through and reverse. Stacked clusters over a wide range suggest a trending move.
+3. **Dual-source confirmation.** The strongest levels are confirmed twice: the model projects liquidations there AND real forced liquidations have already printed nearby. When both agree, the level is not a guess.
 4. **Persistence.** Clusters that stay bright over time are more reliable than ones that flash and fade. Persistent clusters mean traders are holding those positions, not closing them.
 
 Watch for zones where multiple factors align. A bright, persistent cluster sitting just above a consolidation range is a high-probability target.
+
+## Impact Bands: Let the Model Grade the Levels
+
+You do not have to weigh those factors by eye. The terminal does it for you with [impact levels](/docs/features/liquidation-heatmap#impact-levels): a model scores every significant level on how likely it is to produce a real reaction when price gets there, and draws the winners as bands over the mist.
+
+How to read them:
+
+- **Bright band with a white core line**: impact 0.6 or higher. Treat these as your primary support and resistance candidates. This is the shortlist.
+- **Subtle tinted band**: impact 0.4 to 0.6. Watchlist material. Look for other confluence before leaning on it.
+- **No band, just mist**: context. It shapes the picture but is not a level to trade against on its own.
+
+A band's length tells you how long the level has been resting. A band that has been sitting for hours through multiple approaches is a different animal than one that appeared two minutes ago.
+
+Hover any band before acting on it. The tooltip shows the impact score, the modeled size, whether real liquidation prints confirm it, and a measured accuracy line: how often similar levels were actually reached. That number comes from the terminal's live tracking, so it reflects current market behavior, not a backtest from last year.
+
+<Note>
+Impact bands are live-only and honest about it. If the data feed goes stale for more than 30 seconds the bands disappear rather than showing you outdated levels, and they take a few minutes to warm up after a backend restart. If you want them off, toggle **Impact S/R levels (model)** in the heatmap settings.
+</Note>
 
 ## Basic Trading Workflow
 
@@ -68,7 +86,7 @@ Open the heatmap and note where the brightest zones sit relative to current pric
 
 ### Step 2: Determine the nearest high-probability zone
 
-Find the closest bright cluster to current price. This is the most likely near-term target. Price tends to gravitate toward liquidity.
+Find the closest bright cluster to current price. This is the most likely near-term target. Price tends to gravitate toward liquidity. The fastest version of this step: look for the nearest impact band. The model has already done the grading.
 
 ### Step 3: Wait for price to approach
 
