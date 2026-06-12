@@ -1,0 +1,112 @@
+---
+title: "Order Management Center"
+description: "The bottom dock: positions, orders, history, running strategies, and the panic button."
+---
+
+The Order Management Center is a full-width dock at the bottom of the terminal. It is resizable, collapsible, and independent of your chart layout. Change your panes all you want, the dock stays put.
+
+<Note>
+The venue is the source of truth. Every number in the dock comes from the exchange, not from local estimates. What you see is what Bitunix says you have.
+</Note>
+
+## Feed health
+
+A status dot shows the data connection:
+
+| Color | Meaning |
+| --- | --- |
+| Green | Live websocket feed |
+| Yellow | Degraded. Fell back to REST polling. Algos continue running |
+| Red | Disconnected |
+
+## Symbol filter
+
+Show all contracts, or only the symbol of the current pane. Useful when you trade several markets and want the dock to follow your focus.
+
+## Tabs
+
+### Positions
+
+Your open positions, live.
+
+| Column | Notes |
+| --- | --- |
+| Symbol | With side and leverage |
+| Quantity | Position size |
+| Notional | Position value |
+| Entry price | |
+| Mark price | |
+| Liquidation price | |
+| Margin | With margin ratio |
+| Unrealized PnL | With ROE |
+| Realized PnL | |
+| Break-even price | |
+| TP/SL | Inline edit, no dialog needed |
+
+**Actions:** Flash Close (instant market close), Partial Close (choose an amount), Close All (with confirmation).
+
+### Open Orders
+
+Everything resting on the exchange right now.
+
+| Column | Notes |
+| --- | --- |
+| Time | |
+| Symbol | |
+| Type badge | Limit, Market, TWAP, Scaled, Chase, Iceberg, Swarm |
+| Side | |
+| Price | |
+| Amount | |
+| Filled | Progress bar |
+| TP/SL | Badge if attached |
+| Source | Manual, or the parent algo that placed it |
+
+**Actions:** per-row cancel, Cancel All, and filter chips to switch between regular orders and TP/SL orders.
+
+<Tip>
+The Source column tells you which algo owns a child order. If a TWAP is misbehaving, you can trace every order it placed.
+</Tip>
+
+### Order History
+
+Past orders with status (Filled, Canceled, Expired, Partially Filled and Canceled), average fill price, filled quantity shown as "k of N", and order ID. Paginated with load more.
+
+### Trade History
+
+Individual fills: price, quantity, maker or taker role, fee paid, realized PnL, trade ID. This is where you audit your actual execution quality.
+
+### Position History
+
+Closed positions: average entry, average exit, closing PnL, open and close times.
+
+### Strategies
+
+Running and completed [advanced orders](/docs/trading/advanced-orders).
+
+| Column | Notes |
+| --- | --- |
+| Type | Icon per algo type |
+| Symbol | |
+| Side | |
+| Progress | Filled/total with bar |
+| Children | Done/total child orders |
+| Next action | "next slice in 14s", "chasing @ 64,231", "refill ready" |
+| Feed | Badge showing the algo's data feed health |
+| Exit policy | Chip, click to toggle Close/Keep on terminal exit |
+| Status | Running, Paused, Guard-hold, Degraded, Completing, Done, Failed |
+
+**Actions:** Pause/Resume, Cancel, Details.
+
+The Details drawer shows the full parameter recap (the locked snapshot you confirmed at placement), a child order ledger, and an event log of everything the algo did.
+
+## Panic
+
+The emergency exit. Panic closes **all pending orders** (manual, algo children, TP/SL) and **all open positions**, for one symbol or for everything.
+
+<Warning>
+Panic is total. It cancels every order and market-closes every position in its scope, including stops protecting other trades. Positions are closed at market, so expect slippage in fast conditions. There is no undo.
+</Warning>
+
+To prevent fat-finger disasters, Panic uses a two-click confirm on the same button. Click once, the button changes to "Sure?". Click again within about 3 seconds to execute. The dock shows progress while orders cancel and positions close.
+
+Use it when something is wrong and you want flat, now. For routine exits, use Flash Close or a reduce-only order instead.

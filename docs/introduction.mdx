@@ -5,7 +5,7 @@ description: "What is TradeNet Terminal and why it exists"
 
 # Introduction
 
-TradeNet Terminal is a native desktop trading terminal for crypto derivatives. Built in Rust with the Iced GUI framework. GPU-accelerated rendering via wgpu (the rendering backend for Iced's canvas). Sub-1ms exchange latency. It aggregates order flow from Binance, Bybit, OKX, and Hyperliquid into a single interface.
+TradeNet Terminal is a native desktop trading terminal for crypto derivatives. Built in Rust with the Iced GUI framework. GPU-rendered via wgpu. Sub-1ms exchange latency. It aggregates order flow from Binance, Bybit, OKX, and Hyperliquid into a single interface, and executes trades natively on Bitunix.
 
 Currently in closed beta (v0.8.6). Available on Windows and macOS.
 
@@ -17,11 +17,42 @@ That is not good enough.
 
 ## The Solution
 
-TradeNet Terminal runs a self-calibrating liquidation prediction algorithm. It continuously adapts its leverage weight distribution using real liquidation events as feedback. Static models decay. This one stays accurate.
+TradeNet Terminal runs a self-calibrating liquidation prediction algorithm. It models open interest distribution and projects liquidation clusters before price reaches them. Real forced liquidation events from Binance, Bybit, and OKX feed back into the model continuously, adjusting its leverage weight distribution in real time. Static models decay. This one stays accurate.
 
-The algorithm ingests real-time data from Binance, Bybit, and OKX, models open interest distribution, and projects liquidation clusters before price reaches them. A calibrator adjusts leverage weights in real time based on actual forceOrder events from all three exchanges. You see the targets. You position ahead of the move.
+You see the targets. You position ahead of the move.
 
-## Supported Exchanges
+## What's in the Terminal
+
+The liquidation heatmap is the flagship. It is not the whole product.
+
+**Charting.** Candlestick, footprint, comparison, and heatmap charts. Multiple layouts, popout windows for multi-monitor setups, theme support.
+
+**Order flow.** Orderbook heatmap, DOM ladder, Time & Sales, open interest tools, and bar stats with 9 server-computed rows per bar.
+
+**Drawing tools.** Full drawing suite including Fixed Range and Anchored Volume Profile, plus TPO.
+
+**Custom indicators.** Write your own in Lua. Sandboxed scripting with full access to the terminal's data.
+
+**Trading.** Native execution on Bitunix. Market and limit orders plus advanced algo orders: Scaled, TWAP, Chase, Iceberg, and Swarm. The Order Management Center tracks everything. Panic close flattens you in one click.
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/docs/quickstart">
+    Your first session, from login to a live liquidation heatmap.
+  </Card>
+  <Card title="Liquidation Heatmap" icon="fire" href="/docs/features/liquidation-heatmap">
+    How the self-calibrating prediction algorithm works.
+  </Card>
+  <Card title="Trading" icon="arrow-right-arrow-left" href="/docs/trading/getting-started">
+    Execute on Bitunix with market, limit, and algo orders.
+  </Card>
+  <Card title="Custom Indicators" icon="code" href="/docs/indicators/creating-indicators">
+    Build your own indicators in Lua.
+  </Card>
+</CardGroup>
+
+## Symbols and Exchanges
+
+Aggregated BTC, ETH, and SOL are the flagship pairs. They combine order flow from every connected exchange into a single stream. Beyond those, thousands of per-exchange pairs are available for charting across Binance, Bybit, OKX, and Hyperliquid.
 
 - **Binance** - USDT and COIN-M perpetuals
 - **Bybit** - Linear and inverse perpetuals

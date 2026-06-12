@@ -29,11 +29,23 @@ This distinction matters. A bright cluster above price is fuel for a short squee
 
 The prediction model is not static. It recalibrates continuously as the market moves.
 
-When new positions open, leverage changes, or funding rates shift, the algorithm adjusts its cluster projections in real time. You do not need to refresh anything. The heatmap updates automatically.
+The algorithm infers position entries from open interest changes combined with taker aggression, then projects liquidation levels for those entries across leverage tiers. Real forced liquidations from Binance, Bybit, and OKX feed back into the model continuously, adjusting which leverage tiers carry the most weight. You do not need to refresh anything. The heatmap updates automatically.
 
 This is important during volatile periods. As positions get liquidated and new ones open, the cluster map reshapes itself. The zones you saw an hour ago may look different now. The algorithm tracks all of it.
 
 Self-calibration also accounts for exchange-specific behavior. Binance liquidation mechanics differ from Bybit, and OKX differs from both. The calibrator uses forceOrder events from all three exchanges (Binance, Bybit, OKX) as feedback, with soft attribution in percent-space and volatility scaling, then aggregates the results into a single view.
+
+## How Zones Persist and Decay
+
+Zones are not repainted from scratch on every update. They have a lifecycle.
+
+- **Reinforcement.** When more positions stack at a level, the zone brightens. More stacked leverage means more fuel.
+- **Sweeps.** When price trades through a zone, it fades over subsequent sweeps rather than vanishing on one wick. Not every position at a level gets liquidated on the first touch.
+- **Expiry.** Untouched zones expire after a few hours. Stale projections age out instead of cluttering the map.
+
+<Note>
+The heatmap keeps roughly 12 hours of history at 1-minute resolution in hot storage. The archive beyond that is growing.
+</Note>
 
 ## Identifying High-Probability Sweep Zones
 

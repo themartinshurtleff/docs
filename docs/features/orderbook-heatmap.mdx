@@ -5,34 +5,38 @@ description: "Visualize resting liquidity across the orderbook in real time"
 
 # Orderbook Heatmap
 
-See where the big orders sit. The orderbook heatmap visualizes resting liquidity across the entire book in real time.
+See where the big orders sit. The orderbook heatmap visualizes resting limit-order depth across the entire book, over time, in real time.
 
 ## What it shows
 
-The heatmap renders limit order depth as color intensity on a price-time axis. Bright zones mean large resting orders. Dark zones mean thin liquidity. You instantly see where the walls are and where the gaps are.
+The heatmap renders resting limit-order depth as color intensity on a price-time axis. Bright zones mean large resting orders. Dark zones mean thin liquidity. You instantly see where the walls are and where the gaps are. Hover any level for the exact resting notional sitting there.
 
 This is how you identify support and resistance zones that actually matter. Not lines drawn on a chart. Real orders sitting in the book ready to absorb or get pulled.
 
-## Sqrt scaling and noise filtering
+Supported symbols: **BTC**, **ETH**, and **SOL**. Same scaling, same filtering, same visual clarity on all three.
 
-Raw orderbook data is noisy. Small orders clutter the view and make it hard to spot what matters. TradeNet applies sqrt scaling to compress the range and bring large orders into focus without losing the smaller ones entirely. Noise filtering removes the background clutter so you see signal, not static. Frames accumulate over 30 seconds, smoothing out the flicker from rapid order updates while still showing meaningful changes in book structure.
+## Square-root scaling and noise filtering
+
+Raw orderbook data is noisy. Small orders clutter the view, and one giant wall can wash out everything else. TradeNet applies square-root scaling to compress the range, so big walls stand out without erasing the smaller structure around them. Noise filtering removes the background clutter so you see signal, not static.
+
+Depth is captured in 30-second frames. That smooths out the flicker from rapid order updates while still showing meaningful changes in book structure.
 
 ## Level outlining
 
 Individual price levels get outlined for clarity. You can distinguish between a single large order at one price and a cluster of smaller orders spread across several ticks. The outline makes the structure of the book readable at a glance.
 
-## ETH and SOL parity
+## History and loading
 
-The orderbook heatmap is not BTC-only. ETH and SOL pairs get the same treatment with full feature parity. Same scaling. Same filtering. Same visual clarity. Whatever you trade, the heatmap works.
+The heatmap does not just show the current state of the book. It shows how the book looked over time. About 12 hours of hot history at 30-second resolution, with a growing long-term archive behind it.
 
-## Historical depth visualization
+When you open the heatmap, history loads fast through tile-based loading. After that, live updates stream over websocket. No polling, no refresh.
 
-The heatmap does not just show you the current state of the book. It shows you how the book looked over time. Watch liquidity build and get pulled. See spoofing patterns where walls appear and vanish. Track how resting orders shift as price moves.
-
-Historical depth turns the orderbook from a snapshot into a story. You can see where liquidity was stacked before a move, whether it got filled or pulled, and how the book reformed afterward.
+Historical depth turns the orderbook from a snapshot into a story. Watch liquidity build and get pulled. See spoofing patterns where walls appear and vanish. Check whether the liquidity stacked before a move got filled or pulled, and how the book reformed afterward.
 
 ## How to use it
 
 Watch for large resting orders near current price. These are levels where the market is likely to react. If a wall sits below price, it may act as support. If it gets pulled as price approaches, that tells you something different.
 
-Combine the orderbook heatmap with the liquidation heatmap. When a liquidation cluster lines up with thin orderbook depth, you have a high-probability acceleration zone. Price will move fast through levels where there is nothing to absorb the flow.
+<Tip>
+Combine the orderbook heatmap with the liquidation heatmap. When a liquidation cluster lines up with thin orderbook depth, you have a high-probability acceleration zone. Price moves fast through levels where there is nothing to absorb the flow.
+</Tip>

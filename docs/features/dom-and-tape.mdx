@@ -1,0 +1,46 @@
+---
+title: "DOM Ladder & Time and Sales"
+description: "Read the book and the tape. Resting depth, traded volume by level, and every print across exchanges."
+---
+
+# DOM Ladder & Time and Sales
+
+The DOM shows you what is waiting. The tape shows you what is happening. Together they are the closest you get to the raw market.
+
+## The DOM ladder
+
+A vertical price ladder with resting bid and ask depth at every level, plus recent traded volume by level so you can see where size has already changed hands.
+
+- **Tick grouping.** Group levels into configurable tick sizes. Tighten for precision, widen for structure.
+- **Recenter.** Snap the ladder back to current price with one action when the market runs away from your view.
+- **Size grading.** Large resting orders are visually graded so walls stand out without you scanning every number.
+
+The ladder is available per exchange (Binance, Bybit, OKX, Hyperliquid) and for aggregated pairs, where depth from all venues combines into one ladder.
+
+## Trading from the DOM
+
+The ladder is also an execution surface. If your account is connected, you trade directly from it:
+
+| Action | Result |
+| --- | --- |
+| Click a price | Places a limit order there |
+| Shift + click | Places a stop order |
+| Drag an order | Reprices it |
+
+Setup and gating are covered in [Trading from the Terminal](/docs/trading/getting-started).
+
+## Time & Sales
+
+The tape prints every trade as it happens: time, price, size, side, and the source exchange. No sampling, no summarizing. Every print.
+
+- **Size filtering.** Hide trades below a size threshold. Retail noise disappears, real flow stays.
+- **Pause and freeze.** Stop the scroll to inspect a burst of prints without losing them.
+- **Large-trade highlighting.** Big prints get flagged visually so you catch them even when the tape is moving fast.
+
+<Note>
+On aggregated pairs, the tape merges all venues into one stream. Each print keeps its exchange label, so you always know which venue a trade came from.
+</Note>
+
+## How to use them together
+
+Watch the ladder for where size is resting. Watch the tape for whether aggressive flow is hitting it. A wall on the DOM that absorbs print after print on the tape is holding. A wall that vanishes the moment the tape speeds up was never real. That read takes seconds once both are in front of you.

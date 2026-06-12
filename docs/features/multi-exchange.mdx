@@ -9,15 +9,17 @@ One exchange shows you one piece of the market. TradeNet shows you all of it.
 
 ## Four exchanges, one view
 
-Data from Binance, Bybit, OKX, and Hyperliquid aggregated into a single unified view. Charting, footprint charts, and orderflow pull from all four exchanges. The liquidation heatmap backend uses data from three exchanges (Binance, Bybit, OKX). OI is aggregated from the same three. Hyperliquid is connected on the frontend for trades and orderflow.
+Charting and orderflow pull from Binance, Bybit, OKX, and Hyperliquid, covering spot and perps where each venue offers them. Aggregated pairs combine all four into a single stream. Liquidation data comes from three exchanges: Binance, Bybit, and OKX.
 
-## Symbols
+## Aggregated pairs vs per-exchange pairs
 
-The liquidation heatmap supports 3 symbols: BTC, ETH, and SOL. The terminal supports many more symbols for charting via all four exchanges.
+Aggregated **BTC**, **ETH**, and **SOL** are the recommended pairs. They get the deepest feature support: footprint charts, bar stats, liquidation and orderbook heatmaps, the DOM ladder, and time and sales all run on aggregated data.
 
-## Sub-1ms exchange latency
+Per-exchange pairs work too. Pick a single venue when you want charting with venue-specific data, like Binance-only volume or Hyperliquid-only flow.
 
-The server infrastructure runs on Hetzner backend with sub-1ms latency to exchange data feeds. When an order hits the book on Binance, TradeNet sees it in under a millisecond. That speed compounds across every feature. Footprint charts, orderbook heatmaps, OI data, liquidation tracking. All of it benefits from being close to the source.
+## Close to the source
+
+The server infrastructure is colocated close to the exchanges. Data reaches your terminal sub-second after it happens on the venue. That speed compounds across every feature. Footprint charts, orderbook heatmaps, OI data, liquidation tracking. All of it benefits from being close to the source.
 
 ## Server-side processing
 
@@ -34,3 +36,7 @@ A large sell order on Binance might look bearish in isolation. But if Bybit and 
 Consider what happens during a fast move. Liquidations fire on Bybit. Aggressive market buys pour in on Binance. OKX open interest spikes. Hyperliquid shows a cluster of new shorts opening. Each exchange tells a fragment of the story. Aggregation tells the whole thing.
 
 Single-exchange tools force you to check multiple tabs, multiple platforms, and piece it together yourself. By the time you have the full picture, the move already happened. TradeNet gives you the full picture in one place, in real time, so you can act on it while it still matters.
+
+## More venues coming
+
+The exchange registry already reserves slots for Coinbase, Kraken, Deribit, Bitget, and others. More venues will plug into the same aggregation pipeline as they come online.

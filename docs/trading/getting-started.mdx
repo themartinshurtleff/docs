@@ -1,0 +1,96 @@
+---
+title: "Trading from the Terminal"
+description: "Execute on Bitunix Futures directly from TradeNet Terminal. No tab switching, no copy-pasting prices."
+---
+
+TradeNet Terminal has native execution built in. You analyze, place, and manage orders in the same window. Your charts, your DOM, your orders, one screen.
+
+<Warning>
+Trading leveraged futures involves substantial risk. You can lose more than your initial margin. Nothing in these docs is financial advice. Size accordingly.
+</Warning>
+
+## Requirements
+
+Before you can place orders, you need:
+
+<Steps>
+  <Step title="A Bitunix Futures account connected via API keys">
+    Bitunix is the only execution venue for now. More exchanges are planned. Follow the [Bitunix connection guide](/docs/integrations/bitunix-connect) to generate keys and link your account.
+  </Step>
+  <Step title="Affiliate verification or a paid plan">
+    Order placement is gated. Either verify your Bitunix account under the TradeNet affiliate link, or subscribe to a paid plan. Charting works without either.
+  </Step>
+</Steps>
+
+<Note>
+This gating applies to every order type. Market, limit, advanced algos, TP/SL, all of it goes through the same check.
+</Note>
+
+Both hedge mode and one-way mode are supported. Leverage is set per symbol from the trade panel.
+
+## Ways to trade
+
+### The trade panel
+
+The trade panel lives in the sidebar. It contains:
+
+- **Order form.** Side, size, price. Pick market or limit, attach TP/SL, set flags.
+- **Leverage and margin controls.** Set leverage per symbol. Switch margin mode.
+- **Account summary.** Balance, used margin, open PnL at a glance.
+
+### Chart trading
+
+Your position lives on the chart. Entry, take profit, stop loss, and liquidation lines are drawn directly on it.
+
+- Drag a TP or SL line to move it. The order updates on the exchange.
+- Click the chart to autofill that price into the order form. Faster than typing.
+
+### DOM ladder trading
+
+The DOM (depth of market) ladder gives you one-click execution at exact prices:
+
+| Action | Result |
+| --- | --- |
+| Left-click a price | Places a limit order there |
+| Shift + click | Places a stop order |
+| Ctrl + click | Places a position-linked stop |
+| Drag an order | Reprices it |
+
+### The bottom dock
+
+The Order Management Center is a dock along the bottom of the terminal. It holds your positions, open orders, history, and running strategies. See [Order Management Center](/docs/trading/order-management).
+
+## Risk-based sizing
+
+Stop guessing contract counts. Enter your risk as a percentage of account or a flat currency amount, and the terminal computes position size for you:
+
+```
+size = risk / |entry - stop|
+```
+
+Set your stop where it belongs on the chart, type your risk, and the size field fills itself. Same risk per trade, every trade.
+
+<Tip>
+Risk-based sizing pairs well with chart trading. Drag your stop line, and the computed size updates with it.
+</Tip>
+
+## Paper mode
+
+Want to practice first? Enable paper mode. The terminal simulates fills without sending anything to the exchange. Use it to learn the panels, test [advanced orders](/docs/trading/advanced-orders), or rehearse a strategy before risking capital.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Order Types" href="/docs/trading/order-types">
+    Market, limit, TP/SL, time-in-force, and closing positions.
+  </Card>
+  <Card title="Advanced Orders" href="/docs/trading/advanced-orders">
+    Scaled entries, TWAP, chase limits, icebergs, and more.
+  </Card>
+  <Card title="Order Management Center" href="/docs/trading/order-management">
+    The bottom dock. Positions, orders, history, strategies, and the panic button.
+  </Card>
+  <Card title="Connect Bitunix" href="/docs/integrations/bitunix-connect">
+    Generate API keys and link your account.
+  </Card>
+</CardGroup>

@@ -1,0 +1,246 @@
+---
+title: "AI Indicator Builder Doc"
+description: "Copy this page into any AI model to generate TradeNet indicators."
+---
+
+<Note>
+Copy this entire page and paste it into ChatGPT, Claude, or any AI model, followed by a description of the indicator you want. Example prompt: "Using the API above, write a TradeNet indicator that plots a 200-period EMA and shades the area between price and the EMA." Save the result as a .lua file in your indicators folder and toggle it on.
+</Note>
+
+---
+
+# TradeNet Terminal Custom Indicator Specification
+
+You are writing a custom indicator for TradeNet Terminal, a crypto trading terminal. Indicators are single Lua 5.4 files. This document is the complete and only specification. Everything you need is here.
+
+## Required script structure
+
+A script is one Lua file that returns a table:
+
+```lua
+return {
+    name = "Indicator Name",        -- string, shown in the indicator browser
+    mode = "overlay",               -- "overlay" or "panel"
+    settings = {                    -- optional, user-tunable values
+        period = { type = "int", default = 20, min = 2, max = 200, label = "Period" },
+    },
+    compute = function(ctx)
+        -- runs when chart data changes (checked every 250ms)
+        -- populate series with ctx.set_value / ctx.set_series
+    end,
+    draw = function(ctx)
+        -- runs right after compute
+        -- issue draw commands (max 10,000)
+    end,
+}
+```
+
+Both `compute` and `draw` receive the same `ctx` object. The series store is cleared before every `compute`, so the script must populate the full series on every run. Rendering replays cached draw commands every frame; Lua does not run per frame.
+
+## Modes
+
+- `"overlay"`: draws on the price chart. Y values are prices.
+- `"panel"`: gets a separate sub-panel with its own scale. Y values are anything (0-100 for an RSI, USD for OI, etc.). Panel indicators automatically render the primary series (values set via `ctx.set_value`) as a line and show a hover readout of all series values. A panel indicator that only sets the primary series can use an empty `draw` body, but the `draw` function itself must still be declared or the script fails to load.
+
+## Settings types
+
+Four types. Each appears in the indicator's settings pane in the terminal. Settings are per-pane, per-indicator.
+
+```lua
+settings = {
+    period = { type = "int",   default = 14,   min = 2,   max = 500,  label = "Period" },
+    mult   = { type = "float", default = 2.0,  min = 0.1, max = 10.0, label = "Multiplier" },
+    flag   = { type = "bool",  default = true,             label = "Show Bands" },
+    col    = { type = "color", default = "#c9a84c",        label = "Color" },
+}
+```
+
+Read values via `ctx.settings.period` etc. `ctx.settings` is read-only.
+
+## Indexing rules (critical)
+
+- Everything is 0-based. Index 0 is the oldest candle. `ctx.candle_count() - 1` is the live (open) candle.
+- Loop with `for i = 0, ctx.candle_count() - 1 do ... end`.
+- `ipairs` and `#` do NOT work on any `ctx` table (including footprint tables). Never use them. Use explicit index loops or while loops.
+- Out-of-range reads return `nil`. Always nil-guard every data access.
+
+## Complete ctx API
+
+### Metadata
+
+- `ctx.candle_count()` -> integer. Number of candles loaded.
+- `ctx.timeframe()` -> number. Timeframe in milliseconds.
+- `ctx.symbol()` -> string. e.g. `"BTCUSDT"`.
+- `ctx.exchange()` -> string. One of: `"BinanceLinear"`, `"BinanceInverse"`, `"BinanceSpot"`, `"BybitLinear"`, `"BybitInverse"`, `"BybitSpot"`, `"HyperliquidLinear"`, `"HyperliquidSpot"`, `"OkexLinear"`, `"OkexInverse"`, `"OkexSpot"`, `"Aggregated"`.
+- `ctx.tick_size()` -> number. Price tick size.
+
+### Candle data (per index i, return number or nil)
+
+- `ctx.open(i)`, `ctx.high(i)`, `ctx.low(i)`, `ctx.close(i)`
+- `ctx.volume(i)` total volume; `ctx.buy_volume(i)`; `ctx.sell_volume(i)`
+- `ctx.time(i)` candle open timestamp in milliseconds
+
+### Bar stats (per index i, return number or nil, can be nil per candle, always guard)
+
+- `ctx.delta(i)` buy minus sell volume
+- `ctx.daily_cvd(i)` daily session CVD, resets at UTC midnight (preferred)
+- `ctx.cvd_24h(i)` alias of `daily_cvd`, NOT a rolling 24h window
+- `ctx.oi_delta(i)` open interest change over the candle, in USD
+- `ctx.daily_oi_cvd(i)` daily OI CVD, in USD
+- `ctx.oi_cvd(i)` alias of `daily_oi_cvd`
+- `ctx.liq_short(i)` short liquidations, USD
+- `ctx.liq_long(i)` long liquidations, USD
+
+### Status and sessions
+
+- `ctx.is_live(i)` -> bool. True only for the open candle.
+- `ctx.is_confirmed(i)` -> bool. True for closed candles.
+- `ctx.session_id(i, reset_hour_utc)` -> integer. Session bucket the candle belongs to.
+- `ctx.is_session_reset(i, reset_hour_utc)` -> bool. True on the first candle of a session.
+- `ctx.is_utc_day_reset(i)` -> bool. True on the first candle of a UTC day.
+
+### Footprint
+
+- `ctx.footprint(i)` -> 0-indexed table of levels, or nil.
+- Each level is a table: `{ price, buy_qty, sell_qty, buy_count, sell_count }`.
+- Quantities are base asset on ALL pane types.
+- Levels are NOT sorted by price.
+- `#` and `ipairs` do not work. Iterate with a while loop:
+
+```lua
+local fp = ctx.footprint(i)
+if fp then
+    local j = 0
+    while fp[j] do
+        local lvl = fp[j]
+        -- lvl.price, lvl.buy_qty, lvl.sell_qty, lvl.buy_count, lvl.sell_count
+        j = j + 1
+    end
+end
+```
+
+### Bulk series
+
+- `ctx.closes()`, `ctx.highs()`, `ctx.lows()`, `ctx.opens()`, `ctx.volumes()`, `ctx.deltas()`
+- Each call builds a fresh table. Call once and reuse, never call inside a loop.
+- On Aggregated panes, candles with missing bar stats appear as NaN in these tables. Guard with `v == v` (NaN ~= NaN).
+- Prefer the indexed accessors (`ctx.close(i)` etc.) in loops; they return nil instead of NaN.
+
+### Math helpers
+
+Computed natively. Signature `ctx.helper(field, period, i)`. Return number or nil.
+
+- `ctx.sma(field, period, i)` simple moving average
+- `ctx.ema(field, period, i)` exponential moving average, seeded with the SMA of the first `period` values. O(i) cost per call, so cache results; never call inside nested loops.
+- `ctx.rsi(field, period, i)` Wilder smoothing, returns 0-100
+- `ctx.stdev(field, period, i)` population standard deviation
+- `ctx.highest(field, period, i)` highest value in window, tolerates partial windows
+- `ctx.lowest(field, period, i)` lowest value in window, tolerates partial windows
+
+Valid field names, exactly: `"close"`, `"open"`, `"high"`, `"low"`, `"volume"`, `"buy_volume"`, `"sell_volume"`, `"delta"`. Any other field raises an error.
+
+### Compute output
+
+- `ctx.set_value(i, v)` sets the primary series. Drives the panel Y-scale and the auto-rendered panel line.
+- `ctx.set_series(i, v, name)` sets a named series. Feeds `draw_band` and the hover readout. NOTE: the name argument comes LAST.
+- `ctx.break_before(i)` starts a new line segment at index i (use at session resets). Must be re-marked on every compute because the series store is cleared.
+
+### Draw commands (call in draw(), max 10,000 per draw call)
+
+Mode matrix:
+
+| Command | overlay | panel |
+|---------|---------|-------|
+| `ctx.draw_line(from_i, from_y, to_i, to_y, color, width)` | yes | yes |
+| `ctx.draw_hline(y, color, width, style)` with style `"solid"` / `"dashed"` / `"dotted"` | yes | yes |
+| `ctx.draw_label(i, y, text, color, font_size)` | yes | no |
+| `ctx.draw_rect(from_i, from_y, to_i, to_y, fill_color, border_color)` border optional | yes | no |
+| `ctx.draw_circle(i, y, radius, color)` | yes | no |
+| `ctx.draw_bar(i, value, color)` any draw_bar replaces the auto primary line | no | yes |
+| `ctx.draw_band(upper_name, lower_name, fill_color)` errors if the named series were not populated in compute | yes | yes |
+
+Widths, font sizes, and radii are screen pixels. Colors are `"#rrggbb"` or `"#rrggbbaa"` hex strings.
+
+### State and settings
+
+- `ctx.state` is a persistent Lua table. It survives between compute and draw and across runs. One VM per pane per script. The VM is fresh when the indicator is toggled off and on, when the pane type changes, or when the app restarts. Do not rely on state for correctness; the series store is cleared every compute regardless.
+- `ctx.settings` is read-only and holds the declared setting values.
+
+## Units per pane type (critical)
+
+- Aggregated panes (`ctx.exchange() == "Aggregated"`): volume, delta, and CVD are USD notional, served from backend bar stats, nil where not loaded.
+- Exchange panes: volume follows the terminal's volume mode (base or quote).
+- Footprint quantities are ALWAYS base asset, on every pane type.
+- OI and liquidation values are ALWAYS USD.
+- There is no `volume_unit()` helper. Detect aggregated panes with `ctx.exchange() == "Aggregated"`.
+
+## Sandbox and limits
+
+- Lua 5.4. Removed: `io`, `os`, `debug`, `require`, `package`, `load`, `coroutine` and friends.
+- Available: `math`, `string` (no `dump`), `table`.
+- No network, no filesystem, no REST endpoints. Indicators read only the data already loaded in the pane.
+- Memory limit: 32 MB. Time limits: 100ms per compute, 50ms per draw. Max 10,000 draw commands per draw call.
+- A script error shows as a badge on the indicator; it does not crash the terminal.
+- `print()` is rate-limited and not surfaced in the UI. Debug visually with labels (overlay) or named series read via the hover readout (panel).
+
+## Session-reset pattern for cumulative series
+
+Cumulative values like `daily_oi_cvd` reset per session. Break the line at resets so it does not draw a vertical jump:
+
+```lua
+local reset_hour_utc = 0
+local last_session = nil
+for i = 0, ctx.candle_count() - 1 do
+    local val = ctx.daily_oi_cvd(i)
+    if val then
+        local session = ctx.session_id(i, reset_hour_utc)
+        if last_session and session and session ~= last_session then
+            ctx.break_before(i)
+        end
+        if session then last_session = session end
+        ctx.set_value(i, val)
+    end
+end
+```
+
+## Complete working example
+
+A simple SMA overlay. This is the canonical shape of a correct indicator:
+
+```lua
+return {
+    name = "My SMA",
+    mode = "overlay",
+    settings = {
+        period = { type = "int", default = 20, min = 2, max = 200, label = "Period" },
+        line_color = { type = "color", default = "#c9a84c", label = "Color" },
+    },
+    compute = function(ctx)
+        for i = 0, ctx.candle_count() - 1 do
+            local v = ctx.sma("close", ctx.settings.period, i)
+            if v then ctx.set_value(i, v) end
+        end
+    end,
+    draw = function(ctx)
+        local prev = nil
+        for i = 0, ctx.candle_count() - 1 do
+            local v = ctx.sma("close", ctx.settings.period, i)
+            if v and prev then
+                ctx.draw_line(i - 1, prev, i, v, ctx.settings.line_color, 1.5)
+            end
+            prev = v
+        end
+    end,
+}
+```
+
+## Rules for the AI
+
+- Always nil-guard every data access. Any per-candle value can be nil.
+- Populate the full series every compute. The series store is cleared before each run.
+- Re-mark `break_before` every compute. Breaks do not persist.
+- Never use `ipairs` or `#` on ctx tables, including footprint level tables. Use explicit index loops or while loops.
+- Cache `ctx.ema` results in a local table instead of calling it in nested loops. It is O(i) per call.
+- Keep within 100ms compute, 50ms draw, and 10,000 draw commands.
+- Use only documented ctx members. Nothing else exists.
+- No `os`, `io`, `require`, or any removed library. The sandbox blocks them.

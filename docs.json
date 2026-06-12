@@ -22,26 +22,45 @@
             ]
           },
           {
-            "group": "Features",
+            "group": "Workspace",
             "pages": [
-              "docs/features/liquidation-heatmap",
+              "docs/guides/layouts-and-charts",
+              "docs/features/drawing-tools"
+            ]
+          },
+          {
+            "group": "Market Data",
+            "pages": [
               "docs/features/footprint-charts",
               "docs/features/orderbook-heatmap",
               "docs/features/open-interest",
+              "docs/features/dom-and-tape",
               "docs/features/multi-exchange"
             ]
           },
           {
-            "group": "Guides",
+            "group": "Liquidation Intelligence",
             "pages": [
-              "docs/guides/reading-the-heatmap",
-              "docs/guides/layouts-and-charts"
+              "docs/features/liquidation-heatmap",
+              "docs/guides/reading-the-heatmap"
             ]
           },
           {
-            "group": "Integrations",
+            "group": "Trading",
             "pages": [
-              "docs/integrations/bitunix-connect"
+              "docs/trading/getting-started",
+              "docs/integrations/bitunix-connect",
+              "docs/trading/order-types",
+              "docs/trading/advanced-orders",
+              "docs/trading/order-management"
+            ]
+          },
+          {
+            "group": "Custom Indicators",
+            "pages": [
+              "docs/indicators/creating-indicators",
+              "docs/indicators/scripting-reference",
+              "docs/indicators/ai-doc"
             ]
           }
         ]
@@ -90,6 +109,13 @@
       "label": "Join Waitlist",
       "href": "https://tradenet.org/terminal"
     }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "chatgpt",
+      "claude"
+    ]
   },
   "footer": {
     "socials": {
