@@ -75,6 +75,7 @@
           {
             "group": "Updates",
             "pages": [
+              "blog/beta-is-launching-soon",
               "blog/closed-beta-launch",
               "blog/why-we-built-tradenet"
             ]
