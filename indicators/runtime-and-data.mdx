@@ -1,0 +1,239 @@
+---
+title: "Lua Runtime and Data"
+description: "Understand indicator lifecycle, pane data, units, limits, and beta behavior"
+---
+
+# Lua Runtime and Data
+
+TradeNet runs custom Lua in a restricted Lua VM inside a Web Worker. Each pane and script instance has its own VM and state. The worker keeps indicator failures away from chart rendering and the rest of the terminal.
+
+## Runtime lifecycle
+
+Active instances use a 250ms change-gated scheduler. They do not execute on every visual animation frame.
+
+When relevant pane data changes:
+
+1. TradeNet refreshes the instance context
+2. The primary and named series stores are cleared
+3. `compute(ctx)` runs
+4. `draw(ctx)` runs
+5. The completed series and drawing commands are cached for rendering
+
+Populate the full output series on every compute. Do not assume values from the previous cycle remain in the series store.
+
+`ctx.state` is different. It is a writable table that persists across recomputes for one instance:
+
+```lua
+ctx.state.last_session = ctx.state.last_session or nil
+ctx.state.running_total = ctx.state.running_total or 0
+```
+
+State is cleared by source reload, indicator removal, worker replacement for that instance, and app restart. Do not use it for user preferences.
+
+## Source reloads
+
+Saving a user source changes its catalog version. Active instances using that source reload automatically. A reload creates fresh script state, so use candle data to reconstruct anything that must survive an edit.
+
+Changing a symbol, timeframe, or the loaded candle window can shift index positions without creating a fresh VM. Rebuild index-based caches during compute instead of assuming index `i` always refers to the same timestamp.
+
+## Indexing, time, and nil
+
+All candle and returned data tables use zero-based indexing. Index `0` is the oldest loaded candle. The newest is `ctx.candle_count() - 1`.
+
+Do not use `ipairs()` or `#` on TradeNet data tables. Use an explicit loop:
+
+```lua
+for i = 0, ctx.candle_count() - 1 do
+    local close = ctx.close(i)
+    if close ~= nil then
+        -- calculate
+    end
+end
+```
+
+Optional and historical data can be sparse. A missing value is normally `nil`, not zero. Nil-guard every optional feed so missing coverage does not become a false market signal.
+
+Timestamps use Unix milliseconds. `ctx.time(i)` returns the candle-open timestamp.
+
+## Confirmed and live candles
+
+`ctx.is_live(i)` is true only for the newest loaded candle. `ctx.is_confirmed(i)` is true for valid candles before it.
+
+The live candle can change until it closes. For alerts and automated entries that should not repaint, act on a confirmed candle:
+
+```lua
+local i = ctx.candle_count() - 2
+if i >= 0 and ctx.is_confirmed(i) then
+    -- evaluate a closed-bar signal
+end
+```
+
+Backtests also evaluate closed replay bars. A strategy that trades the live candle can therefore behave differently in replay.
+
+## Pane ownership
+
+Lua reads the snapshot held by its chart pane. It does not open network connections, choose a separate exchange, or request a different symbol.
+
+The pane owns:
+
+- Symbol and timeframe
+- Aggregated or venue candle data
+- Bar statistics and OI where available
+- Footprint and tape caches where available
+- Decoded liquidation and orderbook heatmap tiles where requested
+- Trading state and events
+
+On aggregated panes, data represents the active TradeNet venue set. On venue panes, it represents the selected venue where that source is available.
+
+## Data requirements
+
+Six optional requirements control heavier pane data:
+
+| Requirement | Enables |
+| --- | --- |
+| `footprint` | Footprint rows, traded-at-price, VAP, and session profiles |
+| `liq_heatmap` | Liquidation tiles, nearest clusters, live pools, and events |
+| `ob_heatmap` | Orderbook depth tiles, imbalance, walls, and level history |
+| `trades` | Retained raw prints and large-trade filtering |
+| `oi` | Host OI samples |
+| `l1` | Best bid, ask, spread, and microprice when a DOM snapshot exists |
+
+Requirements are merged across all active Lua scripts in one pane. Heatmap data can be hydrated for a script even when that heatmap is not the visible chart layer.
+
+Use capability checks before reading an optional source:
+
+```lua
+if ctx.has_trades() then
+    local rows = ctx.trades(i, { limit = 500 })
+end
+```
+
+## Units you can rely on
+
+| Data | Current unit |
+| --- | --- |
+| OHLC | Quote price |
+| `volume`, `buy_volume`, `sell_volume` | USD notional |
+| `delta` | Buy minus sell USD notional |
+| Footprint `buy_qty`, `sell_qty` | Base asset |
+| Raw trade `qty` | Base asset |
+| Raw trade `notional` | USD |
+| `oi` | Base asset |
+| `liq_long`, `liq_short` | USD where available |
+| Exact heatmap values | USD |
+| Non-exact heatmap values | Relative intensity |
+
+<Warning>
+In the current beta, `ctx.volume_unit()` returns `"base"` on venue panes even though the candle volume accessors still expose USD-notional fields. Treat `volume`, `buy_volume`, and `sell_volume` as USD notional in this build. Do not convert them as base quantity solely because of `volume_unit()`.
+</Warning>
+
+## Exact, estimated, and partial data
+
+Heatmap helpers can return either exact USD values or render intensity. Inspect both `unit` and `exact` before labeling or combining a value:
+
+```lua
+local value, exact = ctx.ob_depth(i, "bid", 0.5)
+if value ~= nil and exact then
+    -- safe to label as USD depth
+end
+```
+
+Never label intensity as dollars. Never add exact USD and intensity together.
+
+`ctx.vap()` reports `covered` and `missing` candle counts. If `missing > 0`, label the profile as partial or avoid acting on it.
+
+Some bar-stat fallbacks also have reduced exactness. In particular, `ctx.oi_delta(i)` prefers USD OI Delta, but its fallback can be only the numeric difference between adjacent base-OI values. Do not present a fallback result as exact USD.
+
+## Current directional limitations
+
+Decoded liquidation heatmap tiles do not preserve an independent long and short notional for each price bucket. `ctx.liq_levels()` exposes the visual bucket magnitude, but it must not be used as exact directional notional.
+
+For direction, use one of these instead:
+
+- `ctx.liq_events(i)` for observed long or short liquidations
+- `ctx.liq_live_pools()` for current model pool direction
+- `ctx.liq_nearest()` for inferred short fuel above price or long fuel below price
+
+Orderbook `ctx.ob_walls()` currently returns `persistence = 1` as a placeholder. It is not a spoofing or persistence score. Use `ctx.ob_level_history()` when you need actual trailing frame presence.
+
+## Visible range
+
+`ctx.visible_range()` is an advisory optimization range. The tracked upper bound can act as an exclusive chart bound, while the fallback range is inclusive. Publication is also coalesced as the user pans.
+
+Use it to reduce heavy drawing work, not to decide whether an indicator is logically valid:
+
+```lua
+local first, last = ctx.visible_range()
+first = math.max(0, first or 0)
+last = math.min(ctx.candle_count() - 1, last or (ctx.candle_count() - 1))
+```
+
+## Sandbox
+
+Lua has no direct access to:
+
+- Filesystem
+- Network
+- Processes
+- Module loading
+- Dynamic code loading
+- Debug hooks
+- Coroutines
+
+The following globals are removed:
+
+```text
+io os package require dofile loadfile load loadstring
+collectgarbage coroutine debug
+```
+
+`math`, `string`, and `table` remain available.
+
+## Runtime limits
+
+| Limit | Current value |
+| --- | --- |
+| Compute client timeout | 350ms |
+| Load, validate, and settings timeout | 4 seconds |
+| Backtest client timeout | 35 seconds |
+| Worker backtest budget | 20 seconds |
+| Draw commands per cycle | 10,000 |
+| Popups per cycle | 16 |
+| Trade intents per cycle | 4 |
+| Logs retained per instance | 500 |
+| Heatmap tiles per kind | 16 |
+| Heatmap cells per kind | 4,000,000 |
+| Heatmap cells per tile | 2,000,000 |
+
+There is no separately enforced 32MB per-VM memory limit in the current Tauri runtime.
+
+If an instance times out, TradeNet disables the offender, restarts the worker, and reloads the surviving instances. The disabled indicator stays stopped until it is reloaded by the user or source lifecycle.
+
+> **Screenshot placeholder:** [Lua Editor diagnostic screenshot. Annotate a script with a declared requirement, the Problems tab with a runtime diagnostic, and the Logs tab with info and warning rows.]
+
+## Performance rules
+
+- Cache bulk tables instead of requesting them inside a candle loop
+- Avoid calling EMA repeatedly inside nested loops
+- Do not call `ctx.vap()` for every candle unless the script truly needs a rolling profile
+- Use `visible_range()` to reduce heavy drawing work
+- Use a primary series instead of thousands of line segments when possible
+- Skip decorative drawing during replay with `if not ctx.is_backtest() then`
+- Keep logs focused, especially inside historical loops
+
+## Known beta gaps
+
+These are current limitations, not undocumented features:
+
+- Generated Lua settings controls and persisted custom values are not wired yet
+- `volume_unit()` conflicts with venue candle volume fields as described above
+- `visible_range()` has mixed tracked and fallback upper-bound semantics
+- Most chart panes do not expose L1 or DOM snapshots to Lua
+- Funding helpers return `nil`
+- Liquidation visual tiles lack exact long and short decomposition
+- OB wall persistence is a placeholder
+- User file editing is desktop-only
+- Some editor snippets or hover text can still mention retired Iced-era API names
+- Light backtests have intentionally limited historical optional feeds
+
+Continue with the [Lua Scripting Reference](/indicators/scripting-reference) for method signatures and return shapes.

@@ -1,0 +1,65 @@
+---
+title: "Panes, Tabs, and Linking"
+description: "Add tools, group tabs, split panes, and control which markets they follow"
+---
+
+# Panes, Tabs, and Linking
+
+The workspace is made from panes. A pane can contain one tab or a group of tabs.
+
+## Pane types
+
+The beta includes:
+
+- **Chart**
+- **Orderbook**
+- **Time & Sales**
+- **Indicator**
+- **Trade**
+- **Backtester**
+
+Use the quick-add icons in the lower left rail to spawn them.
+
+## Working with tabs
+
+Pane tabs behave like browser tabs:
+
+- Click a tab to activate it
+- Drag tabs to reorder them
+- Drop a tab onto another tab or the center of a pane to group them
+- Drop near an edge to split the workspace in that direction
+- Drag a grouped tab away to detach it into its own pane
+- Press `Escape` to cancel an active drag
+
+Grouped tabs remain mounted while inactive. Their chart state and loaded data do not need to start from zero every time you switch back.
+
+> **Screenshot placeholder:** [Picture of two panes during a tab drag, with the center grouping target and four edge split targets outlined and annotated.]
+
+## Selected pane
+
+Click anywhere inside a pane to select it. The selected-pane toolbar directly below the top bar now targets that pane.
+
+This matters before changing:
+
+- Market
+- Timeframe
+- Chart style
+- Heatmap
+- Indicators
+- Chart settings
+- Link state
+
+## Linked panes
+
+A linked pane follows shared market changes. This is useful for a chart, Orderbook, and tape that should always show the same symbol.
+
+Changing a market or timeframe from a pane-specific control can unlink that pane so it can operate independently. Use the link control in the selected-pane toolbar to restore or remove linking.
+
+## Sending markets from the screener
+
+The Markets screener supports two routes:
+
+- Click a row to send the market to the selected pane
+- Click **ALL** to send it to every compatible pane
+
+Use **ALL** carefully if some panes are intentionally unlinked.

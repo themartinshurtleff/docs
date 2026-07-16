@@ -1,0 +1,57 @@
+---
+title: "Installation"
+description: "Install the signed TradeNet Terminal beta on Windows"
+---
+
+# Installation
+
+The beta is distributed as a signed Windows installer.
+
+## What you need
+
+- Windows 10 or Windows 11, 64-bit
+- A TradeNet account with terminal access
+- A stable internet connection
+- Enough screen space for the workspace you want to build
+
+macOS is not part of the current beta release.
+
+## Install TradeNet
+
+<Steps>
+  <Step title="Download the installer">
+    Download the latest file ending in `x64-setup.exe` from the official TradeNet release location provided to beta users.
+  </Step>
+  <Step title="Run the installer">
+    Open the `.exe` and follow the Windows installer prompts. The application is Authenticode-signed, so Windows can verify the publisher and file integrity.
+  </Step>
+  <Step title="Launch the terminal">
+    Open TradeNet Terminal from the Start menu or desktop shortcut.
+  </Step>
+  <Step title="Sign in">
+    Use the same email and password as your TradeNet website account. Terminal access is checked by the server after authentication.
+  </Step>
+</Steps>
+
+## Which release files do I need?
+
+Beta users only need the installer `.exe`.
+
+You may also see:
+
+- A `.sig` file used by the desktop updater to verify signed releases
+- `SHA256SUMS.txt` used to verify artifact checksums
+
+Those files are part of the release and update pipeline. You do not open them to install the terminal.
+
+## Updates after installation
+
+The terminal checks for updates shortly after launch and again during long sessions. When a newer signed release is available, TradeNet shows an in-terminal update dialog with release notes and download progress.
+
+Updates are never silently installed. See [Desktop Updates](/support/updates) for the full process.
+
+## Installation problems
+
+If Windows blocks the installer, first confirm that the file came from the official TradeNet release location and that its digital signature is valid. Do not work around a warning for a file received from another person or an unofficial mirror.
+
+For login, blank window, data, or update problems, use [Troubleshooting](/support/troubleshooting).

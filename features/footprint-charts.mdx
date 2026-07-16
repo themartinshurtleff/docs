@@ -1,0 +1,95 @@
+---
+title: "Footprint Charts"
+description: "Read buy and sell activity at each price inside every candle"
+---
+
+# Footprint Charts
+
+A candlestick tells you the range. A footprint tells you how that range traded.
+
+TradeNet footprints use per-price buy and sell activity inside each candle. Aggregated footprints combine supported venues before the levels are rendered.
+
+## Enable footprint mode
+
+Select a chart pane, then change the chart style from **Candlesticks** to **Footprint** in the selected-pane toolbar.
+
+If the visible range has not loaded yet, TradeNet requests it. The footprint cache fills the visible area first and repairs interior gaps instead of assuming that old and recent data are continuous.
+
+## Render modes
+
+Choose between:
+
+- **Cluster boxes**, which place the selected values inside price-level cells
+- **Profile histogram**, which shows horizontal activity at each price level
+
+## Data profiles
+
+The footprint can display:
+
+- Bid and ask
+- Total volume
+- Delta
+
+Volume can be shown in base-asset units or USD where the selected data source supports it.
+
+## Price grouping
+
+Price grouping combines exchange ticks into readable rows.
+
+Use:
+
+- **Auto** for a grouping selected from chart scale
+- Fixed groupings of 1, 2, 3, 5, 10, 20, 50, or 100 ticks
+
+Tighter grouping shows more detail. Wider grouping reduces noise and keeps cells readable while zoomed out.
+
+## Point of control
+
+Enable the POC outline to mark the price level with the most activity inside each footprint candle.
+
+## Imbalances
+
+Diagonal imbalance compares aggressive activity across neighboring bid and ask prices.
+
+Controls include:
+
+- Imbalance ratio
+- Minimum size
+- Minimum stacked levels
+- Extension lines
+
+Stacked imbalances help identify repeated one-sided pressure across adjacent levels. They are context, not automatic entries.
+
+## Candle header
+
+The optional footprint header can show:
+
+- Volume
+- Delta
+- Open-interest information
+
+You can also control cell numbers, value rounding, text contrast, colors, and other display choices.
+
+## Summary column
+
+The summary column profiles the footprint data across:
+
+- The visible chart range
+- The current UTC day
+- A custom number of candles, up to 1,440
+
+It is useful when you want one profile beside the chart without drawing a fixed-range object.
+
+## Venue selection
+
+On aggregated panes, footprint venues can follow the chart's aggregated Kline set or use an independent supported venue selection.
+
+Keep them linked when you want OHLC and footprint flow to describe the same venue set. Separate them only when you understand the comparison you are making.
+
+> **Screenshot placeholder:** [Picture of one footprint candle and the footprint settings panel, with bid, ask, delta, POC, a diagonal imbalance, a stacked imbalance, and the summary column outlined and annotated.]
+
+## History and gaps
+
+Footprint history is retained separately from plain candles. A candle can have OHLC and bar stats while its price-level footprint is not available.
+
+TradeNet does not silently invent missing levels. See [Data Quality](/support/data-quality) for how partial ranges are handled.

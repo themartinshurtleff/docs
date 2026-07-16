@@ -1,0 +1,74 @@
+---
+title: "Multi-Exchange Aggregation"
+description: "Understand aggregated markets, venue subsets, and per-exchange comparisons"
+---
+
+# Multi-Exchange Aggregation
+
+Crypto order flow is fragmented. TradeNet can combine supported venues into one market view or isolate a single exchange.
+
+## Aggregated markets
+
+Aggregated BTC, ETH, and SOL are the main combined markets.
+
+Depending on the data layer, TradeNet can aggregate supported inputs from:
+
+- Binance
+- Bybit
+- OKX
+- Hyperliquid
+
+Not every exchange provides every data type. For example, orderbook heatmap and backend OI coverage use their supported venue sets, while aggregated trade and footprint products can include a broader set.
+
+## Per-exchange markets
+
+The desktop terminal exposes linear perpetual listings for Binance, Bybit, OKX, and Hyperliquid.
+
+Use a per-exchange market when:
+
+- You execute or hedge on one venue
+- A move appears to be venue-led
+- You want to compare price, volume, tape, or depth against the aggregate
+- A specific market does not exist in the BTC, ETH, or SOL aggregated set
+
+## Global aggregation settings
+
+Settings can define the venue selection used across aggregated panes.
+
+The terminal can apply that set to:
+
+- Klines
+- Footprints
+- Bar stats
+- Backend metrics
+- Native row indicators
+- Venue-aware overlays
+
+You can apply the set to all panes and lock panes to it.
+
+## Layer-specific choices
+
+Some tools can follow the chart's venue set or use their own supported selection.
+
+Examples include:
+
+- Footprint venues
+- Footprint Bar Stats
+- Native row indicators
+- Orderbook heatmap
+- Time-Fixed Volume Profile
+
+An independent set can be useful for comparison, but it can also make two values look contradictory when they are simply measuring different venues.
+
+## Unit differences
+
+Aggregated and per-exchange data can use different units.
+
+Read the unit label before comparing:
+
+- Aggregated candle volume and delta commonly use USD notional
+- Footprint levels use base-asset quantity
+- OI level is retained in base units and displayed in USD on the native row
+- OI Delta, Daily OI CVD, and liquidation rows use USD
+
+See [Data Quality](/support/data-quality) for the full labeling rules.

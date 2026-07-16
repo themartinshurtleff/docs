@@ -3,10 +3,16 @@
   "theme": "mint",
   "name": "TradeNet",
   "colors": {
-    "primary": "#c9a84c",
+    "primary": "#6f5200",
     "light": "#f0c040",
-    "dark": "#c9a84c"
+    "dark": "#8f6f22"
   },
+  "redirects": [
+    {
+      "source": "/docs/:slug*",
+      "destination": "/:slug*"
+    }
+  ],
   "favicon": "/favicon.png",
   "appearance": {
     "default": "dark",
@@ -20,51 +26,68 @@
           {
             "group": "Getting Started",
             "pages": [
-              "docs/introduction",
-              "docs/installation",
-              "docs/quickstart"
+              "introduction",
+              "installation",
+              "account-and-access",
+              "quickstart",
+              "interface-tour",
+              "feature-index"
             ]
           },
           {
             "group": "Workspace",
             "pages": [
-              "docs/guides/layouts-and-charts",
-              "docs/features/drawing-tools"
+              "guides/layouts-and-charts",
+              "guides/panes-tabs-and-linking",
+              "guides/markets-and-timeframes",
+              "guides/templates-themes-and-settings",
+              "features/drawing-tools"
             ]
           },
           {
-            "group": "Market Data",
+            "group": "Charts and Order Flow",
             "pages": [
-              "docs/features/footprint-charts",
-              "docs/features/orderbook-heatmap",
-              "docs/features/open-interest",
-              "docs/features/dom-and-tape",
-              "docs/features/multi-exchange"
-            ]
-          },
-          {
-            "group": "Liquidation Intelligence",
-            "pages": [
-              "docs/features/liquidation-heatmap",
-              "docs/guides/reading-the-heatmap"
+              "features/footprint-charts",
+              "features/bar-stats-and-indicators",
+              "features/volume-profiles-and-tpo",
+              "features/liquidation-heatmap",
+              "guides/reading-the-heatmap",
+              "features/liquidation-events",
+              "features/orderbook-heatmap",
+              "features/open-interest",
+              "features/dom-and-tape",
+              "features/multi-exchange",
+              "features/markets-screener"
             ]
           },
           {
             "group": "Trading",
             "pages": [
-              "docs/trading/getting-started",
-              "docs/integrations/bitunix-connect",
-              "docs/trading/order-types",
-              "docs/trading/advanced-orders",
-              "docs/trading/order-management"
+              "trading/getting-started",
+              "trading/order-types",
+              "trading/order-management",
+              "trading/advanced-orders",
+              "integrations/bitunix-connect"
             ]
           },
           {
-            "group": "Custom Indicators",
+            "group": "Lua and Backtesting",
             "pages": [
-              "docs/indicators/creating-indicators",
-              "docs/indicators/scripting-reference",
-              "docs/indicators/ai-doc"
+              "indicators/creating-indicators",
+              "indicators/runtime-and-data",
+              "indicators/scripting-reference",
+              "indicators/examples-and-recipes",
+              "indicators/algo-automation",
+              "indicators/backtesting",
+              "indicators/ai-doc"
+            ]
+          },
+          {
+            "group": "Support",
+            "pages": [
+              "support/updates",
+              "support/data-quality",
+              "support/troubleshooting"
             ]
           }
         ]
@@ -111,8 +134,8 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Join Waitlist",
-      "href": "https://tradenet.org/terminal"
+      "label": "TradeNet Website",
+      "href": "https://tradenet.org"
     }
   },
   "contextual": {

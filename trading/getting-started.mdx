@@ -1,0 +1,85 @@
+---
+title: "Paper Trading"
+description: "Use the TradeNet beta execution tools through the simulated trading engine"
+---
+
+# Paper Trading
+
+The public beta is paper-first.
+
+Normal beta accounts use TradeNet's local simulated execution engine for:
+
+- Manual market and limit orders
+- Position management
+- Take-profit and stop-loss orders
+- Advanced orders
+- Lua algo intents
+
+The interface is designed to exercise the same workflows without sending real exchange orders.
+
+## Open the Trade panel
+
+Click **Trade** in the left rail or add a Trade pane.
+
+Confirm that the panel identifies the route as simulated or paper before placing an order.
+
+## Choose the market
+
+The Trade pane follows its selected symbol. If it is linked to the chart, changing the shared market updates both.
+
+## Set leverage and margin mode
+
+Choose:
+
+- Leverage
+- Isolated or cross margin mode
+
+In simulation, these settings affect the paper position and liquidation calculations. They do not change a real exchange account.
+
+## Enter size
+
+TradeNet sizes the manual ticket with **margin USD**.
+
+Approximate position notional is:
+
+```text
+margin USD x leverage = position notional
+```
+
+The order preview shows the resulting notional and quantity before confirmation.
+
+## Place a first paper order
+
+<Steps>
+  <Step title="Choose Market or Limit">
+    Use Market for immediate simulated execution or Limit for a resting order.
+  </Step>
+  <Step title="Choose Buy or Sell">
+    Buy opens or increases long exposure. Sell opens or increases short exposure unless reduce-only is enabled.
+  </Step>
+  <Step title="Set size and risk">
+    Enter margin USD, leverage, margin mode, and optional TP or SL levels.
+  </Step>
+  <Step title="Review the preview">
+    Check symbol, side, quantity, notional, order type, and risk settings.
+  </Step>
+  <Step title="Confirm">
+    Submit the paper order, then monitor it in the Trade pane or bottom dock.
+  </Step>
+</Steps>
+
+> **Screenshot placeholder:** [Picture of the Trade panel in simulated mode with Market and Limit tabs, leverage, isolated and cross controls, margin USD, notional preview, TP and SL, reduce-only, and the confirmation button annotated.]
+
+## Global kill switch
+
+The Trade panel includes a global trading kill switch. When trading is disabled, the top bar shows **HALTED**.
+
+The kill switch applies to manual orders, advanced orders, and Lua-driven order intents.
+
+## Live execution
+
+Live Bitunix routing exists for specifically approved accounts. It is restricted during the public beta and is not part of this quick-start flow.
+
+<Warning>
+Paper fills are a simulation. They do not reproduce exchange queue priority, full depth, slippage, latency, partial fills, or every liquidation behavior.
+</Warning>

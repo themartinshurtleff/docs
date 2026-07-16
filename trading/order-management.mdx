@@ -1,0 +1,80 @@
+---
+title: "Order and Position Management"
+description: "Manage positions, orders, histories, strategies, and emergency controls"
+---
+
+# Order and Position Management
+
+TradeNet exposes current execution state in the Trade pane and the bottom order-management dock.
+
+## Bottom dock
+
+The dock can be expanded, collapsed, and resized.
+
+Its tabs are:
+
+- **Positions**
+- **Open Orders**
+- **Order History**
+- **Trade History**
+- **Position History**
+- **Strategies**
+
+Current-position and open-order counts appear on their tabs.
+
+## Positions
+
+The Positions view shows active positions and supports position actions such as:
+
+- Close the full position
+- Partially close
+- Edit take profit and stop loss
+- Close all positions
+
+Always verify the symbol and quantity before using a bulk action.
+
+## Open Orders
+
+The Open Orders view shows resting manual and child orders. Cancel individual orders or use supported bulk cancellation controls.
+
+## History
+
+Order, trade, and position history are separate because they answer different questions:
+
+- **Order History** shows submitted order lifecycle
+- **Trade History** shows completed fills
+- **Position History** shows completed position records
+
+History can be filtered to the focused pane's symbol or left on all symbols.
+
+## Strategies
+
+The Strategies tab monitors:
+
+- Scaled orders
+- TWAP
+- Chase
+- Iceberg
+- Swarm
+- Armed Lua algos
+
+Advanced strategies show progress, child-order counts, next action, exit policy, status, details, child ledger, and recent activity.
+
+## Pause, cancel, and panic
+
+Supported strategy controls include:
+
+- Pause
+- Resume
+- Cancel one strategy
+- Cancel all strategies
+- Panic by symbol
+- Panic all
+
+Panic controls are intentionally armed before firing.
+
+## Kill switch
+
+Disable trading from the Trade panel when you need to stop new execution actions. The top bar displays **HALTED** while the switch is active.
+
+The kill switch is broader than canceling one order. It blocks new execution through the shared trading route.

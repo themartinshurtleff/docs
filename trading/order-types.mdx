@@ -1,0 +1,80 @@
+---
+title: "Order Types and Risk Controls"
+description: "Configure manual market, limit, reduce-only, TP, and SL orders"
+---
+
+# Order Types and Risk Controls
+
+The manual Trade ticket supports market and limit orders with shared sizing and risk controls.
+
+## Market orders
+
+A market order enters or reduces a simulated position at the current paper execution price.
+
+Use it when immediate execution matters more than controlling the exact entry.
+
+## Limit orders
+
+A limit order rests at your selected price until the simulated market reaches it or you cancel it.
+
+Use it when the entry price matters more than immediate execution.
+
+## Buy and sell
+
+- **Buy** opens or increases a long position
+- **Sell** opens or increases a short position
+
+If an opposing position already exists, the result depends on size and reduce-only state.
+
+## Reduce-only
+
+Reduce-only prevents the order from increasing exposure. Use it for exits and partial closes.
+
+## Leverage
+
+The leverage control changes paper notional relative to the entered margin USD.
+
+Higher leverage increases exposure and brings the estimated liquidation price closer. It does not make a setup better.
+
+## Margin mode
+
+- **Isolated** assigns margin to the selected position
+- **Cross** models shared account margin
+
+The beta simulation exposes both workflows. Exact exchange liquidation and account rules can differ from the simulator.
+
+## Take profit
+
+The manual ticket supports up to five take-profit levels with allocation percentages.
+
+Make sure allocations describe how much of the position should close at each target.
+
+## Stop loss
+
+The ticket supports one stop-loss level for the position.
+
+Review the stop direction before confirming:
+
+- A long stop belongs below the relevant market price
+- A short stop belongs above it
+
+## Confirmation
+
+TradeNet shows a confirmation step before submitting the order. Read it.
+
+Check:
+
+- Market
+- Side
+- Order type
+- Margin USD
+- Leverage
+- Notional
+- Quantity
+- Limit price
+- Reduce-only
+- TP and SL
+
+<Tip>
+Use a small paper size until the position, order, and history tabs behave exactly the way you expect.
+</Tip>

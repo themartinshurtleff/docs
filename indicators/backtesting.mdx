@@ -1,0 +1,159 @@
+---
+title: "Backtesting Lua Strategies"
+description: "Replay Lua strategies with no-lookahead execution, conservative fills, and data provenance"
+---
+
+# Backtesting Lua Strategies
+
+Add a **Backtester** from the left rail. It can open as a workspace pane or a floating terminal window.
+
+Each run loads the selected script into a fresh throwaway VM. The backtester does not reuse the running chart instance or its `ctx.state`.
+
+## Light mode
+
+Light mode is available to normal beta users.
+
+- 100 to 5,000 displayed signal bars
+- Up to 6,000 fetched materialized rows
+- Requests are chunked in groups of 1,500 rows
+- Server-backed history for supported BTC, ETH, and SOL instruments
+- Timeframes of 1 minute or higher use historical data
+- Sub-1-minute tests use currently loaded pane data
+- Optional lower-timeframe sub-bars when coverage and row limits allow
+- Recent aggregated footprint history when the source actually calls footprint APIs
+- Short in-memory result caching for an identical repeated run
+
+The requested historical window ends one full display bar behind the newest closed bar. This avoids treating a partially persisted rollover bucket as final data.
+
+Light footprint history is available only for aggregated pairs and is limited to the last 48 hours of the test window. It is fetched only when the script source references `footprint`, `traded_at_price`, `vap`, or `session_levels`.
+
+## Deep mode
+
+Deep mode is visible but admin-only during beta. It supports larger and heavier archive tests, within current ceilings:
+
+- Up to 20,000 bars
+- Lower-timeframe magnification down to 10-second data when available
+- Up to 600,000 raw prints
+- OI and liquidation datasets capped at 800,000 rows each
+- Heatmap frames limited to the final 24 hours of the requested window
+- Archived orderbook heatmap replay using 30-second Binance depth grids
+
+Missing archive coverage is reported. It is not silently invented.
+
+## Configure a run
+
+Choose the script, market, timeframe, bar range, fill model, fee, and available data mode. Light mode currently supports the mapped BTC, ETH, and SOL instruments.
+
+> **Screenshot placeholder:** [Backtester configuration and results screenshot. Annotate Light mode, locked Deep mode, script and market selectors, timeframe, bar count, fill selector, fee input, warning strip, equity curve, Trades tab, Data provenance tab, Guide tab, and chart-marker control.]
+
+## Replay lifecycle
+
+On replay step `i`, the script sees candles from index `0` through `i`.
+
+- `ctx.is_backtest()` is true
+- Warmup begins after 30 bars
+- Fewer than 33 candles returns a not-enough-data result
+- An intent emitted from bar `i` can fill starting on bar `i + 1`
+- The signal cannot fill at the close that created it
+- `ctx.oi_total()` is clamped to the replay cursor
+
+Skip decorative drawing when it is not needed:
+
+```lua
+draw = function(ctx)
+    if ctx.is_backtest() then
+        return
+    end
+
+    -- chart-only drawings
+end
+```
+
+## Fill behavior
+
+### Market orders
+
+Market intents fill at the next bar open.
+
+### Limit orders
+
+Resting limits fill when a later range crosses the requested price. A gap can fill at the requested level or better.
+
+### Stops and targets
+
+Stops fill at the first traded price through the stop and can fill worse on a gap. When an unresolved bar touches both TP and SL, SL wins. This is deliberately conservative.
+
+When lower-timeframe sub-bars are available, the tester uses them to resolve which level traded first. Incomplete sub-bar coverage falls back to the parent bar's conservative range and is reported.
+
+### Position model
+
+The tester simulates:
+
+- Market and limit entries
+- Position-scoped TP and SL
+- One net position
+- Opposite-side entries that can close and flip
+- Entry and exit fees
+
+It does not simulate:
+
+- Queue position
+- Network latency
+- Real slippage
+- Finite orderbook liquidity
+- Partial-fill probability
+
+Treat results as signal and implementation validation, not a promise of live fills.
+
+## Results
+
+The result view reports:
+
+- Trades
+- Net PnL
+- Win rate
+- Profit factor
+- Expectancy
+- Sharpe when enough data exists
+- Maximum drawdown in USD and percent
+- Fees
+- Bars replayed
+- Fill model
+- Equity and drawdown views
+
+The **Trades** tab shows individual fills. The **Data** tab records the sources actually loaded and every coverage warning. The **Guide** tab explains the run controls. Trade markers can be shown on a matching chart.
+
+## Data differences in replay
+
+- Light replay does not expose historical tape through `ctx.trades()`
+- Delta, Daily CVD, OI Delta, and Daily OI CVD can be `nil` in replay datasets
+- Candle `buy_volume - sell_volume` can be used only as a stated proxy
+- L1, funding, and live liquidation pools are not historical series
+- Heatmap exactness still depends on the tile unit
+- Footprint can cover only part of a Light window
+- Deep-only datasets remain unavailable to normal beta accounts
+
+Write scripts with `has_*` checks and nil guards so missing history produces an honest gap or skipped signal.
+
+## Read the warnings
+
+An amber warning does not always mean the run failed. It can mean:
+
+- No signals fired
+- Footprint covered only part of the window
+- Intrabar coverage had gaps
+- An optional source was unavailable
+- A source returned sparse rows
+- The script raised a replay error
+
+The Data tab is the source of truth for what the test actually used.
+
+## A useful test sequence
+
+1. Run a short period and confirm the expected signals appear.
+2. Inspect Trades for next-bar timing and expected tags.
+3. Read every Data warning.
+4. Compare bar-range and intrabar results when intrabar coverage exists.
+5. Increase the window only after the small run makes sense.
+6. Change fees to test whether the edge survives realistic friction.
+7. Paper trade the same source and compare live signal timing.

@@ -1,0 +1,85 @@
+---
+title: "Orderbook and Time & Sales"
+description: "Read multi-venue resting depth and the live trade tape"
+---
+
+# Orderbook and Time & Sales
+
+The Orderbook pane shows resting depth. Time & Sales shows completed trades.
+
+Use them together to compare intent with execution.
+
+## Add the panes
+
+Use the quick-add buttons in the left rail:
+
+- **Add Depth pane** opens the user-facing Orderbook
+- **Add Tape pane** opens Time & Sales
+
+Keep both linked to a chart if you want all three to follow the same market.
+
+## Orderbook pane
+
+The Orderbook is a price ladder with bids, asks, spread information, contribution bars, and cumulative depth.
+
+Quick controls include:
+
+- Recenter and autofollow
+- Base, USD, or combined size display
+- Minimum USD fade
+- Tick grouping
+- Depth-window level count
+- Visible-row density
+
+Settings include:
+
+- Aggregated or per-venue split mode
+- Combined or individual exchange heat
+- Venue selection
+- Spread marker colors
+- Row height
+- Frame rate
+- Delta update cadence
+- Compact or dimmed labels
+- Order-block bar colors, opacity, and scale
+- Cumulative depth band, edge, colors, and opacity
+- Turbo hover behavior
+
+Aggregated books can appear crossed because grouped prices from separate venues overlap. TradeNet labels this honestly instead of forcing the view to resemble one venue's book.
+
+## Time & Sales
+
+The tape shows:
+
+- Time
+- Price
+- Size
+- Buy or sell side
+- Source exchange
+
+Minimum-notional filters include:
+
+- All trades
+- $10,000
+- $50,000
+- $100,000
+- $250,000
+- $1,000,000
+
+Large trades receive stronger visual emphasis.
+
+> **Screenshot placeholder:** [Picture of a linked chart, Orderbook pane, and Time & Sales pane, with venue contribution, spread marker, cumulative depth, a large print, and the minimum-notional filter annotated.]
+
+## Reading them together
+
+Ask:
+
+- Is aggressive flow hitting a visible wall?
+- Is the wall holding, replenishing, or disappearing?
+- Are large prints moving price?
+- Is the same behavior concentrated on one venue?
+- Does the footprint confirm what the tape showed?
+
+<Note>
+The public beta documentation does not describe click-to-trade behavior from the ladder because that is not the normal supported execution path. Place and manage orders from the Trade pane and bottom dock.
+</Note>

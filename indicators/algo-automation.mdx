@@ -1,0 +1,166 @@
+---
+title: "Lua Algo Automation"
+description: "Emit paper order intents with arming, risk rails, tags, and shared execution controls"
+---
+
+# Lua Algo Automation
+
+Lua scripts never place an order directly. They emit declarative intents. The terminal checks arming state, execution mode, risk rails, connection state, access, the kill switch, cooldowns, and idempotency before an accepted intent reaches the same trading store used by manual orders.
+
+## Public beta policy
+
+Normal beta use is paper-first. Live algo execution is restricted and requires the same account and connection gates as manual live trading, plus explicit live arming confirmation.
+
+Disarming an instance returns it to paper mode.
+
+## Status methods
+
+```lua
+ctx.trade_armed()  -- boolean
+ctx.trade_mode()   -- "paper" or "live"
+ctx.is_backtest()  -- boolean
+```
+
+The active APIs are flat methods. Do not use `ctx.trade.market()` or another `ctx.trade` table.
+
+## Order intents
+
+### Market
+
+```lua
+ctx.trade_market({
+    side = "buy",
+    usd = 250,
+    tag = "breakout-entry",
+    reduce_only = false,
+})
+```
+
+### Limit
+
+```lua
+ctx.trade_limit({
+    side = "buy",
+    usd = 250,
+    price = 65000,
+    tag = "pullback-entry",
+    post_only = true,
+    reduce_only = false,
+})
+```
+
+### Cancel
+
+```lua
+ctx.trade_cancel("pullback-entry")
+```
+
+### Close
+
+```lua
+ctx.trade_close()
+```
+
+### Take profit and stop loss
+
+```lua
+ctx.trade_set_tpsl({
+    tp = 66000,
+    sl = 64500,
+})
+```
+
+At least one of `tp` or `sl` is required.
+
+## Arming a strategy
+
+Open the Lua Editor's **Algo** tab and select the pane instance.
+
+An instance must be armed before entry, close, cancel, or TP/SL intents can execute. Disarmed scripts still calculate and render, which lets you inspect their state before trusting them with simulated orders.
+
+Armed state and mode are session-only. Restarting the app returns every script to a disarmed state.
+
+> **Screenshot placeholder:** [Lua Editor Algo tab and bottom Strategies dock shown together. Annotate the selected pane and script, arm control, Paper or Live mode, configured rails, accepted and rejected intent counts, daily realized PnL, last runtime message, and global kill switch status.]
+
+## Default safety rails
+
+| Rail | Default |
+| --- | --- |
+| Maximum order notional | $1,000 |
+| Maximum open orders | 6 |
+| Maximum position notional | $5,000 |
+| Entry and close cooldown | 2,000ms |
+| Maximum daily realized loss | $250 |
+
+Rails persist locally per script. Breaching the daily realized-loss limit force-disarms the instance. The global kill switch remains authoritative over manual, advanced, and Lua-driven orders.
+
+## Tags and idempotency
+
+Every entry intent requires a `tag`. It is truncated to 64 characters and acts as an idempotency key for the current arm session.
+
+One tag can execute once during that session. Recomputing the same signal will not create duplicate entries.
+
+Use the confirmed signal candle's timestamp:
+
+```lua
+local i = ctx.candle_count() - 2
+if i < 1 or not ctx.is_confirmed(i) then
+    return
+end
+
+local fast = ctx.sma("close", 9, i)
+local slow = ctx.sma("close", 20, i)
+local fast_prev = ctx.sma("close", 9, i - 1)
+local slow_prev = ctx.sma("close", 20, i - 1)
+
+if fast and slow and fast_prev and slow_prev then
+    local cross_up = fast > slow and fast_prev <= slow_prev
+
+    if cross_up then
+        ctx.trade_market({
+            side = "buy",
+            usd = 250,
+            tag = "long-" .. tostring(ctx.time(i)),
+        })
+    end
+end
+```
+
+## Per-cycle behavior
+
+- Maximum 4 intents can be emitted in one cycle
+- Entry tags are required
+- A compute or draw error prevents that cycle's intents from executing
+- Cooldowns and position/order limits can reject an otherwise valid intent
+- Disarmed scripts do not execute intents
+- The Strategies and Algo views show accepted and rejected counts
+
+## Live-candle repaint risk
+
+The newest candle is still forming. A condition on that candle can disappear before close.
+
+Backtests evaluate closed replay bars and fill intents beginning on the next bar. Use `ctx.is_confirmed(i)` and the most recent closed index when you want live and replay behavior to line up.
+
+## Paper before unattended use
+
+<Steps>
+  <Step title="Validate the source">
+    Fix every editor Problem and inspect Logs on several symbols and timeframes.
+  </Step>
+  <Step title="Backtest the logic">
+    Confirm that signals fire, inspect data warnings, and look beyond headline PnL.
+  </Step>
+  <Step title="Observe while disarmed">
+    Confirm that the script reaches the expected state without sending orders.
+  </Step>
+  <Step title="Arm in paper mode">
+    Start with small order, position, and daily-loss limits.
+  </Step>
+  <Step title="Monitor Strategies">
+    Watch accepted and rejected intents, simulated positions, daily PnL, and runtime messages.
+  </Step>
+</Steps>
+
+<Warning>
+Automation magnifies logic mistakes. Validation proves that a module loads. Backtesting checks a model of historical execution. Neither proves that the strategy is profitable or that a live market will fill it the same way.
+</Warning>

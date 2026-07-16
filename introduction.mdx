@@ -1,0 +1,72 @@
+---
+title: "Introduction"
+description: "What TradeNet Terminal is, what the beta includes, and where to begin"
+---
+
+# Introduction
+
+TradeNet Terminal is a Windows desktop terminal for crypto derivatives and order flow. It combines aggregated market data, liquidation intelligence, footprint charts, open interest, orderbook depth, execution tools, Lua scripting, and backtesting in one workspace.
+
+The current terminal uses a Tauri desktop shell with a React and TypeScript interface, a Rust native host, and a canvas-based chart engine. Older references to the retired Rust and Iced interface are outdated.
+
+## What the beta is built for
+
+TradeNet is built for traders who want to see what is happening inside the move, not only where a candle opened and closed.
+
+The terminal gives you:
+
+- Aggregated BTC, ETH, and SOL markets across Binance, Bybit, OKX, and Hyperliquid
+- Per-exchange linear perpetual markets
+- Candlestick and footprint charts
+- Liquidation and orderbook heatmaps
+- Liquidation impact levels and event bubbles
+- Volume CVD, open interest, OI Delta, Daily OI CVD, and estimated net positioning
+- A multi-venue orderbook, Time & Sales tape, and markets screener
+- Drawing tools, volume profiles, TPO, moving averages, and volume bubbles
+- Paper trading with manual, advanced, and Lua-driven orders
+- A Lua editor and a no-lookahead backtesting system
+- Saved workspaces, chart templates, indicator templates, drawing templates, themes, and automatic desktop updates
+
+This is a large terminal. You do not need to learn all of it at once. Start with one chart, one orderbook, and one tape. Build from there.
+
+<CardGroup cols={2}>
+  <Card title="Install the Beta" icon="download" href="/installation">
+    Install the signed Windows desktop build and sign in.
+  </Card>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Build a useful first workspace in a few minutes.
+  </Card>
+  <Card title="Feature Index" icon="list-checks" href="/feature-index">
+    Find every documented beta feature in one place.
+  </Card>
+  <Card title="Data Quality" icon="shield-check" href="/support/data-quality">
+    Understand exact, estimated, partial, live-only, and stale data labels.
+  </Card>
+</CardGroup>
+
+## Market coverage
+
+Aggregated markets are available for **BTC**, **ETH**, and **SOL**. They combine supported venues into one market view and are the recommended place to begin.
+
+The native desktop terminal also lists linear perpetual markets from:
+
+- Binance
+- Bybit
+- OKX
+- Hyperliquid
+
+Market data does not require your own exchange API key.
+
+## Trading during beta
+
+The public beta is paper-first. Normal beta accounts use the terminal's local simulated execution engine for manual orders, advanced orders, position management, and Lua automation.
+
+Live Bitunix routing exists behind a restricted account gate. It is not part of the normal beta setup and should not be treated as available unless TradeNet explicitly enables it for your account.
+
+<Warning>
+TradeNet is analytical and execution software. It does not remove market risk. Paper results, model outputs, heatmaps, and backtests are not guarantees of future performance.
+</Warning>
+
+## Where to go next
+
+Read [Installation](/installation), then follow [Quick Start](/quickstart). The [Interface Tour](/interface-tour) explains the shell without assuming you already know where everything is.

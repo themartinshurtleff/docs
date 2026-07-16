@@ -1,0 +1,47 @@
+---
+title: "Account and Access"
+description: "Create an account, sign in, recover a password, and understand beta access"
+---
+
+# Account and Access
+
+Your TradeNet account handles identity. Terminal access is a separate server-side entitlement attached to that account.
+
+Creating an account does not automatically bypass the beta gate.
+
+## Create an account
+
+Create your account on the TradeNet website with an email address and password. Confirm your email if the signup flow asks you to.
+
+Once your beta access is active, the same credentials work in the desktop terminal.
+
+## Sign in to the terminal
+
+Enter your email and password on the terminal login screen.
+
+The **Remember me** option keeps a refresh credential on the device so the terminal can restore your session. The short-lived access token is not stored as a permanent password substitute.
+
+## Forgot your password
+
+Use **Forgot password** from the website sign-in flow. Open the recovery email on the same device, follow the link, and choose a new password on the TradeNet reset page.
+
+After changing the password, return to the terminal and sign in again.
+
+## Access errors
+
+An authenticated account can still be denied terminal access. Common reasons include:
+
+- The account has not been admitted to the beta
+- Access expired or was revoked
+- A subscription or manual entitlement is inactive
+- The terminal session is stale and needs a new sign-in
+
+The server checks access on protected requests. Changing local files or client state does not grant access.
+
+<Tip>
+If the website account works but the terminal says you are unauthorized, sign out of the terminal, close it, reopen it, and sign in again. If the result does not change, contact TradeNet with the account email and the exact message shown.
+</Tip>
+
+## Sign out
+
+Open **Settings**, find the account section, and choose **Sign out**. Signing out clears the active terminal session on that device.

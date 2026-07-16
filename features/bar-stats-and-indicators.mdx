@@ -1,0 +1,92 @@
+---
+title: "Bar Stats and Indicators"
+description: "Configure native order-flow rows, bar statistics, moving averages, and bubble overlays"
+---
+
+# Bar Stats and Indicators
+
+Open the chart indicator browser to add native rows and overlays.
+
+## Footprint Bar Stats
+
+The bar-stats panel can show these rows under each candle:
+
+| Row | Meaning |
+| --- | --- |
+| Volume | Total traded volume |
+| Buy Vol | Aggressive buy volume |
+| Sell Vol | Aggressive sell volume |
+| Delta | Buy volume minus sell volume |
+| Daily CVD | Cumulative volume delta reset at UTC midnight |
+| OI Delta | Open-interest change during the candle |
+| Daily OI CVD | Cumulative OI Delta reset at UTC midnight |
+| Short Liq | Short liquidation notional in the candle |
+| Long Liq | Long liquidation notional in the candle |
+
+The settings panel lets you:
+
+- Show or hide rows
+- Change row order
+- Choose USD or base display units where supported
+- Choose the aggregated venue set
+- Resize the panel
+
+## Native row indicators
+
+### Delta
+
+Shows per-candle aggressive buy volume minus aggressive sell volume.
+
+### Daily CVD
+
+Accumulates volume delta and resets at UTC midnight. This is a daily session value, not a rolling 24-hour calculation.
+
+### Open Interest
+
+Plots the open-interest level. The stored backend level is base-asset OI and the display converts it to USD using the matching candle close.
+
+### Net Positioning
+
+Net Positioning is an estimate. It allocates open-interest changes between modeled long and short positioning using aggressor flow and price pressure.
+
+It is not exchange-reported long and short account truth.
+
+Settings include smoothing, flow weight, UTC daily reset, visible long and short series, and colors for increases and position decreases.
+
+## Row settings
+
+Native rows support:
+
+- Line or candle style where applicable
+- Colors and line styles
+- Automatic or logarithmic scale where applicable
+- Per-row venue selection
+- Row resizing
+- Saved indicator templates
+
+## Moving averages
+
+The Moving Averages overlay supports multiple SMA and EMA rows. Configure each row's type, period, color, width, and line style.
+
+## Volume bubbles
+
+Volume Bubbles can source bubble size and placement from:
+
+- Candle delta
+- Candle OI Delta
+- Large buys
+- Large sells
+- Large trades on both sides
+- Liquidations
+
+Configure thresholds, radius, colors, labels, grouping, and execution-only filtering.
+
+## Indicator panes
+
+An Indicator pane gives analytical rows their own workspace pane instead of stacking everything beneath one chart. Use it when a dense chart becomes difficult to read.
+
+> **Screenshot placeholder:** [Picture of a chart with Footprint Bar Stats, Daily CVD, Open Interest, Net Positioning, Moving Averages, and Volume Bubbles visible, with each row or overlay named.]
+
+<Note>
+Missing metrics remain missing. TradeNet does not turn an unavailable OI or liquidation row into a zero, because zero would mean something different.
+</Note>

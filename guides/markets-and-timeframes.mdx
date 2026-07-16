@@ -1,0 +1,62 @@
+---
+title: "Markets and Timeframes"
+description: "Choose aggregated or per-exchange markets and create valid custom intervals"
+---
+
+# Markets and Timeframes
+
+Market and timeframe controls appear in the selected-pane toolbar.
+
+## Aggregated markets
+
+The **AGG** tab contains:
+
+- BTC
+- ETH
+- SOL
+
+Aggregated markets combine supported venue data and are the main TradeNet order-flow products.
+
+## Per-exchange markets
+
+The native desktop terminal also exposes linear perpetual markets from:
+
+- Binance
+- Bybit
+- OKX
+- Hyperliquid
+
+Choose the venue tab, then select a market. Per-exchange panes are useful when you need to isolate one venue instead of reading the combined market.
+
+## Preset timeframes
+
+The standard list includes:
+
+- 15 seconds
+- 30 seconds
+- 1 minute
+- 5 minutes
+- 15 minutes
+- 1 hour
+- 4 hours
+
+## Custom timeframes
+
+Open the timeframe menu, enter a number, select seconds, minutes, hours, or days, then add it.
+
+Valid custom timeframes run from 1 second to 30 days.
+
+There is one important rule:
+
+- Sub-minute timeframes are live-only
+- Timeframes of 1 minute or higher must be whole-minute multiples
+
+For example, 7 minutes and 2 hours are valid. A 90-second interval is rejected because exact historical candles cannot be reconstructed by splitting a 1-minute source candle.
+
+## History behavior
+
+Minute-based custom timeframes are built from a canonical interval that divides evenly into the requested display interval. Flow metrics are summed. Level and cumulative metrics use the final source value in the combined bar.
+
+Heatmaps automatically request a visual resolution appropriate to the chart scale. A 4-hour chart does not need to paint every 1-minute heatmap frame.
+
+> **Screenshot placeholder:** [Picture of the market menu and custom timeframe creator, with AGG and venue tabs, the current symbol, and the whole-minute validation rule annotated.]

@@ -1,0 +1,101 @@
+---
+title: "Volume Profiles and TPO"
+description: "Use Time-Fixed, Fixed Range, Anchored Volume Profile, Anchored VWAP, and TPO"
+---
+
+# Volume Profiles and TPO
+
+TradeNet includes periodic profiles, drawing profiles, Anchored VWAP, and time-at-price profiles.
+
+## Time-Fixed Volume Profile
+
+Add **Time-Fixed Volume Profile** from the indicator browser.
+
+It creates recurring session or period profiles with controls for:
+
+- Candle estimate or exact footprint-based VAP
+- Aggregated venue selection
+- Auto row count or fixed price-bin size
+- Value-area percentage
+- Left or right placement
+- Profile width in chart time
+- Opacity
+- POC, value area, session separators, labels, and line extensions
+- HVN and LVN marks with node-strength control
+
+Profile modes include:
+
+- Buy and sell
+- Total
+- Delta
+- Trade count
+- Average trade size
+
+You can also split bars by venue and choose aggregate or named per-venue POC lines.
+
+## Fixed Range Volume Profile
+
+Choose the fixed-range profile from the drawing toolbar, then mark the beginning and end of the range.
+
+The profile uses exact footprint VAP when it is available. If the range lacks price-level data, TradeNet can fall back to a candle estimate and labels the result as approximate.
+
+## Anchored Volume Profile
+
+Place one anchor and let the profile extend to the current chart edge. It updates as the range grows.
+
+Use it for:
+
+- A session open
+- A swing high or low
+- A major event candle
+- The beginning of a trend or balance area
+
+## Profile controls
+
+Drawing profiles support:
+
+- Buy and sell, total, delta, trade count, and average trade-size modes
+- Venue splits
+- Aggregate or per-venue POC
+- POC, VAH, and VAL
+- HVN and LVN detection
+- Fixed tick or automatic row binning
+- Optional mirrored secondary profile
+- Hover statistics
+
+## Anchored VWAP
+
+Anchored VWAP calculates a volume-weighted average from the chosen anchor forward. Use it when the relevant value reference begins at a specific event instead of at a fixed daily session.
+
+## TPO Profile
+
+TPO measures time at price. It does not measure traded volume.
+
+Inputs can use:
+
+- Candle ranges
+- Raw trades where available
+
+TPO settings include:
+
+- Session length
+- TPO period
+- Ticks per row
+- Maximum rows
+- Value-area percentage
+- Profile width, opacity, themes, cell size, outlines, and letters
+- POC, VAH, VAL, value-area fill, and initial balance
+- Extended level lines
+- Single prints
+- Session separators
+- Labels and header
+
+> **Screenshot placeholder:** [Composite picture of Time-Fixed Volume Profile, a selected Fixed Range Volume Profile, an Anchored Volume Profile, Anchored VWAP, and TPO, with POC, VAH, VAL, HVN, LVN, initial balance, and a single print annotated.]
+
+## Which one should I use?
+
+- Use **Time-Fixed Volume Profile** for repeating sessions
+- Use **Fixed Range** for a completed move or balance area
+- Use **Anchored Volume Profile** for a range that should keep developing
+- Use **Anchored VWAP** for a running fair-value reference
+- Use **TPO** to study acceptance and rejection through time at price

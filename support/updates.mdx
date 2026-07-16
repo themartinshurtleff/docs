@@ -1,0 +1,58 @@
+---
+title: "Desktop Updates"
+description: "Check, download, verify, and install signed TradeNet releases"
+---
+
+# Desktop Updates
+
+TradeNet uses a signed desktop update flow.
+
+## Automatic checks
+
+The terminal checks:
+
+- About 15 seconds after desktop launch
+- About every 6 hours during a long-running session
+
+A newer release opens an update dialog after you reach the authenticated terminal.
+
+## Update dialog
+
+The dialog shows:
+
+- Current version
+- Available version
+- Release notes
+- Download progress
+- Signature-verification assurance
+- Install readiness
+
+Choose **Later** to dismiss that version for the current session. It can appear again after a future launch.
+
+## Manual check
+
+Open **Settings**, scroll to **Updates**, and choose the manual check action.
+
+## Download and install
+
+Downloads and installation are user-initiated.
+
+TradeNet does not silently download an update or force an immediate restart.
+
+## Restart blockers
+
+Install and restart are blocked while any of these are active:
+
+- Open positions
+- Pending orders
+- Active advanced orders
+- Armed Lua strategies
+- Unsaved Lua drafts
+
+Resolve the listed blockers, then retry.
+
+> **Screenshot placeholder:** [Picture of the update-available dialog and Settings update section, with release notes, progress, Later, Download, Install and Restart, and one restart-blocker message annotated.]
+
+## Signature verification
+
+The updater verifies the signed release artifact before installation. Do not replace updater files with an installer received from another person.

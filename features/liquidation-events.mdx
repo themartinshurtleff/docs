@@ -1,0 +1,58 @@
+---
+title: "Liquidation Events and Bubbles"
+description: "Plot observed forced-liquidation events and understand venue price accuracy"
+---
+
+# Liquidation Events and Bubbles
+
+Liquidation bubbles plot observed forced-liquidation events on the chart.
+
+They are different from the liquidation heatmap:
+
+- The heatmap is projected model structure
+- Bubbles are events reported by exchanges
+
+## Add the overlay
+
+Open the indicator browser and add **Liquidation Bubbles**.
+
+Settings include:
+
+- Minimum notional
+- Bubble radius
+- Opacity
+- Long and short colors
+- Labels
+- Event grouping
+- Execution-only filtering
+
+## Event placement
+
+TradeNet normalizes supported liquidation streams and places events in the matching candle.
+
+Price precision depends on the venue:
+
+- Binance liquidation events can provide exact execution prices
+- Bybit and OKX can report reference or bankruptcy-style values rather than the final execution tick
+
+When an event price is not exact, TradeNet treats it as an estimate and can place it within the matching candle instead of pretending it traded at a known exact tick.
+
+## Compression and grouping
+
+Many events can occur in a short cascade. When the chart is compressed, bubbles can cluster so the display remains readable.
+
+Increase the minimum notional when you want to remove smaller events and focus on the largest forced flow.
+
+## Reading bubbles
+
+Use bubbles to answer:
+
+- Did real liquidations begin near the modeled area?
+- Which side was forced?
+- Was the event isolated or part of a cascade?
+- Did price continue after the forced flow or immediately reject?
+- Did OI contract with the event?
+
+<Note>
+A summed OI contraction is not the same thing as exact liquidation volume. Positions can close voluntarily. Use liquidation events and OI together without treating them as interchangeable.
+</Note>

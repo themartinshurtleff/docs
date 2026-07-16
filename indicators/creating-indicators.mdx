@@ -1,0 +1,215 @@
+---
+title: "Creating Lua Indicators"
+description: "Create, validate, save, and run custom indicators in TradeNet"
+---
+
+# Creating Lua Indicators
+
+TradeNet custom indicators are single Lua files that run inside the terminal. A script can read the data already available to a chart pane, calculate one or more series, draw on the chart, show alerts, and optionally emit paper-trading intents.
+
+You do not need a separate development environment. The desktop terminal includes the editor, validator, logs, examples, chart controls, and backtester.
+
+## Open the Lua Editor
+
+Open **Lua Editor** from the left rail, the chart Lua menu, or the indicator browser.
+
+The editor includes:
+
+- Monaco editing with Lua syntax highlighting
+- Folding, minimap, find, replace, and the command palette
+- Completions, snippets, and hover help for common TradeNet APIs
+- A script catalog containing bundled examples and user scripts
+- Problems and Logs tabs
+- Quick Reference and backtest controls
+- Draft recovery for unsaved work
+
+> **Screenshot placeholder:** [Full Lua Editor screenshot. Annotate the script catalog, Monaco editor, New, Save, Save As, Validate, Add to Selected Pane, Update on Chart, Open Folder, Problems, Logs, Algo, Backtest, and Reference controls.]
+
+## Start from an example
+
+The current desktop build includes these read-only examples:
+
+- ALSAR Decision Matrix
+- ALSAR Decision Overlay
+- SMA Crossover
+- SMA Cross Algo
+- Absorption Reversal Algo
+- Bollinger Bands
+- RSI
+- Volume Delta
+- Stoploss Roast
+
+Bundled examples are compiled into the application. They are not automatically copied into your user script folder. Saving a bundled example creates a user-owned copy and leaves the bundled source unchanged.
+
+## Your first script
+
+Every indicator returns one Lua table. This panel example plots a 20-period SMA:
+
+```lua
+return {
+    name = "My SMA",
+    mode = "panel",
+
+    settings = {
+        period = {
+            type = "int",
+            default = 20,
+            min = 2,
+            max = 200,
+            label = "Period",
+        },
+    },
+
+    compute = function(ctx)
+        local period = ctx.settings.period
+
+        for i = 0, ctx.candle_count() - 1 do
+            local value = ctx.sma("close", period, i)
+            if value ~= nil then
+                ctx.set_value(i, value)
+            end
+        end
+    end,
+
+    draw = function(ctx)
+        ctx.draw_hline(0, "rgba(255,255,255,0.20)", 1, "solid")
+    end,
+}
+```
+
+Required fields are:
+
+| Field | Purpose |
+| --- | --- |
+| `name` | Display name in the editor and chart |
+| `mode` | `overlay` or `panel` |
+| `compute` | Calculates series, state, alerts, and order intents |
+| `draw` | Emits chart drawing commands |
+
+The `settings` and `requires` tables are optional.
+
+## Overlay and panel modes
+
+### Overlay
+
+`mode = "overlay"` uses the chart's price scale. Use it for moving averages, bands, levels, markers, and price-based signals.
+
+### Panel
+
+`mode = "panel"` creates a row below the chart with its own Y scale. Use it for oscillators, delta, CVD, OI studies, histograms, and state matrices.
+
+In panel mode, values written with `ctx.set_value()` form the primary series. Use `ctx.draw_bar()` for a histogram or `ctx.hide_primary()` when custom drawings should replace the line.
+
+## Validate and run
+
+<Steps>
+  <Step title="Create or open a script">
+    Choose **New**, open a bundled example, or select one of your saved scripts.
+  </Step>
+  <Step title="Write and validate">
+    Choose **Validate**. Source, module, metadata, settings-schema, and requirements errors appear in Problems.
+  </Step>
+  <Step title="Save the file">
+    Choose **Save** or **Save As**. A bundled script becomes a user-owned copy when saved.
+  </Step>
+  <Step title="Select a chart pane">
+    Click the chart that should own the indicator. Selection matters when several panes are open.
+  </Step>
+  <Step title="Add the indicator">
+    Choose **Add to Selected Pane**. The instance now uses that pane's symbol, timeframe, candles, and optional data.
+  </Step>
+  <Step title="Iterate">
+    Edit and save the source. Active instances using that script reload after the catalog source version changes. **Update on Chart** can also force the selected running copy to reload.
+  </Step>
+</Steps>
+
+> **Screenshot placeholder:** [Chart and indicator workflow screenshot. Annotate the selected chart pane, indicator browser or Lua add control, the active Lua indicator row, its error/status area, and the action used to remove or reload the instance.]
+
+## What Validate proves
+
+Validation checks that:
+
+- The Lua source executes as a module
+- The module returns a table
+- Required metadata and functions are present
+- Declared setting types are valid
+- Requirement metadata can be parsed
+
+Validation does not run `compute(ctx)` against real pane data. A script can validate successfully and still fail when it encounters a nil value, an unsupported draw command, or logic that exceeds a runtime limit. Always add it to a pane and inspect Problems and Logs.
+
+## User script files
+
+User scripts are editable `.lua` files in the desktop app's data directory. Use **Open Folder** so you do not have to locate that directory manually.
+
+Filenames must follow these rules:
+
+- One filename only, with no nested directory
+- `.lua` extension
+- A non-empty filename stem
+- ASCII letters, numbers, spaces, `_`, `-`, and `.` only
+- No path traversal
+
+The browser build can load bundled examples, but user file save, rename, delete, and Open Folder operations require the Tauri desktop app.
+
+## Draft recovery
+
+The editor keeps unsaved drafts in local application storage. Draft recovery is useful after an accidental close, but it is not a replacement for saving the `.lua` file.
+
+## Settings in the current beta
+
+Scripts can declare `int`, `float`, `bool`, and `color` settings. Their defaults are parsed and exposed through `ctx.settings`:
+
+```lua
+settings = {
+    length = { type = "int", default = 20, min = 2, max = 200 },
+    threshold = { type = "float", default = 1.5 },
+    show_marks = { type = "bool", default = true },
+    color = { type = "color", default = "#f0c040" },
+}
+```
+
+<Warning>
+The current Tauri beta does not yet generate editable per-indicator controls or persist custom Lua setting values. Scripts currently receive their declared defaults. To change a value now, edit the default in the source and save the script. `min`, `max`, and `step` are metadata, but the worker does not enforce them.
+</Warning>
+
+## Optional data requirements
+
+Declare only the optional data your script actually needs:
+
+```lua
+requires = {
+    footprint = true,
+    liq_heatmap = false,
+    ob_heatmap = false,
+    trades = false,
+    oi = false,
+    l1 = false,
+}
+```
+
+Requirements from every Lua script in one pane are merged. TradeNet then keeps the necessary pane data hydrated. Scripts never make their own server requests.
+
+An unavailable requirement does not crash the terminal. The related `has_*` method remains false or the accessor returns `nil`. Your script is responsible for handling that honestly.
+
+## Logs and errors
+
+Use:
+
+```lua
+print("loaded")
+log.info("signal ready")
+log.warning("footprint unavailable")
+log.error("invalid state")
+```
+
+`print` maps to info. The Logs tab keeps the newest 500 rows for each running instance. Tables are shown as `[table]`, so log individual fields when debugging.
+
+Load, compute, draw, timeout, and sandbox errors disable or flag the affected indicator instead of crashing the terminal.
+
+## Where to go next
+
+- [Runtime and Data Model](/indicators/runtime-and-data) explains lifecycle, units, optional feeds, safety, and known beta gaps.
+- [Lua Scripting Reference](/indicators/scripting-reference) lists every current `ctx` method.
+- [Examples and Recipes](/indicators/examples-and-recipes) gives working patterns for sessions, overlays, footprint data, and event alerts.
+- [Lua Algo Automation](/indicators/algo-automation) covers paper order intents and risk rails.
+- [Backtesting](/indicators/backtesting) explains replay, fills, data coverage, and result interpretation.

@@ -1,0 +1,89 @@
+---
+title: "AI-Assisted Lua Workflow"
+description: "Give an AI assistant the real TradeNet contract and verify its output"
+---
+
+# AI-Assisted Lua Workflow
+
+An AI assistant can help write TradeNet Lua, but it needs the actual terminal contract. A generic Lua or trading prompt will often invent methods, use one-based arrays, or assume data that is not present.
+
+## Give it the current docs
+
+Provide:
+
+- [Creating Lua Indicators](/indicators/creating-indicators)
+- [Runtime and Data Model](/indicators/runtime-and-data)
+- [Lua Scripting Reference](/indicators/scripting-reference)
+- [Examples and Recipes](/indicators/examples-and-recipes)
+- [Lua Algo Automation](/indicators/algo-automation) when the script trades
+- [Backtesting](/indicators/backtesting) when the script must replay
+
+Do not provide old Iced-era examples as the API contract.
+
+## Describe the indicator precisely
+
+Include:
+
+- Overlay or panel mode
+- Exact source fields and units
+- Declared default values
+- Signal, alert, or entry conditions
+- Confirmed-bar behavior
+- Missing-data behavior
+- Colors, labels, and readout
+- Whether it must run in Light backtests
+
+Example:
+
+```text
+Write a TradeNet panel indicator that plots ctx.daily_cvd(i). Use zero-based
+loops, leave a gap when the value is nil, and call ctx.break_before(i) at a
+UTC session reset. Draw a zero line. Use only methods in the provided current
+Tauri reference. Do not use retired Iced APIs.
+```
+
+## Require these rules
+
+Tell the assistant to:
+
+- Use zero-based loops
+- Never use `ipairs()` or `#` on TradeNet data tables
+- Nil-guard sparse and optional data
+- Populate the full primary series every compute
+- Use only documented methods
+- Treat candle volume as USD notional in the current build
+- Treat footprint quantity as base asset
+- Respect heatmap `unit` and `exact`
+- Gate non-repainting entries on confirmed candles
+- Use stable popup and entry tags
+- Skip expensive chart drawing during replay
+- Stay inside sandbox and runtime limits
+
+The current beta parses setting defaults but does not provide generated controls for changing them. Ask the assistant to put the desired defaults directly in the source.
+
+## Validate inside TradeNet
+
+<Steps>
+  <Step title="Paste into the Lua Editor">
+    Create a new user script with a valid `.lua` filename.
+  </Step>
+  <Step title="Validate">
+    Fix every reported source, module, metadata, settings, and requirements problem.
+  </Step>
+  <Step title="Run on a pane">
+    Validation does not execute `compute` against real data. Add it to a chart to test runtime behavior.
+  </Step>
+  <Step title="Inspect Logs">
+    Log specific fields around unexpected nil values, branches, and runtime state.
+  </Step>
+  <Step title="Test variation">
+    Compare symbols, timeframes, aggregated and venue panes, and missing optional data.
+  </Step>
+  <Step title="Backtest and paper trade">
+    Read Data warnings, verify next-bar fills, then use tight paper rails.
+  </Step>
+</Steps>
+
+<Warning>
+AI-generated code can validate and still be logically wrong. Validation proves the module shape. A backtest proves behavior inside a simplified replay model. You still have to verify the idea, units, data coverage, repaint behavior, and risk.
+</Warning>

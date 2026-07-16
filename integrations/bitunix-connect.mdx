@@ -1,0 +1,56 @@
+---
+title: "Bitunix Live Connection"
+description: "Restricted live-execution connection for specifically approved beta accounts"
+---
+
+# Bitunix Live Connection
+
+<Warning>
+Live Bitunix routing is restricted during the public beta. Normal beta accounts are forced through paper trading even if live-execution controls are visible.
+</Warning>
+
+This page exists for users whom TradeNet has specifically approved for the live route.
+
+## Before connecting
+
+Confirm all of the following:
+
+- TradeNet has enabled live access for your account
+- You are using the signed desktop app
+- You understand that real funds are at risk
+- Your Bitunix account and regional eligibility permit the activity
+- You have created a dedicated API credential with the minimum required permissions
+
+Do not use a withdrawal-enabled API key.
+
+## Open the connection flow
+
+Open the Trade pane and choose the Bitunix connection action. Approved accounts can also select the live route in terminal settings.
+
+## Credential storage
+
+The desktop app stores exchange credentials in the operating system keychain through the Rust host.
+
+Credentials are not placed in browser storage and are not exposed to Lua scripts.
+
+## Verify the route
+
+After connecting:
+
+1. Confirm the account status is connected
+2. Confirm the route says live, not simulated
+3. Confirm symbol metadata, leverage, and margin mode synchronize
+4. Start with the smallest practical order
+5. Verify the order on Bitunix itself
+
+## Disconnect
+
+Use the Trade pane or terminal settings to disconnect and remove the stored credential from the current device.
+
+## If access is denied
+
+If the account is not approved, the central route remains simulated. Re-entering credentials or changing local settings does not override the server and client account gate.
+
+<Note>
+TradeNet may change live-access requirements during beta. Follow the current instructions provided directly with your approval.
+</Note>

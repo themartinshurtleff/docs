@@ -1,0 +1,82 @@
+---
+title: "Liquidation Heatmap"
+description: "Read projected liquidation density and live model impact levels"
+---
+
+# Liquidation Heatmap
+
+The liquidation heatmap shows modeled liquidation density across price and time for aggregated BTC, ETH, and SOL.
+
+It is a model. It is not a map of exact exchange-held positions.
+
+## Turn it on
+
+Select a chart pane and choose **Liquidation** from the heatmap control in the selected-pane toolbar.
+
+Open the heatmap settings to configure:
+
+- Theme
+- Automatic, SD, or HD resolution
+- Intensity
+- Opacity
+- Minimum notional
+- Model impact bands
+
+The chart automatically chooses historical heatmap products that match the visible timeframe and scale.
+
+## Reading the grid
+
+The heatmap is a price-time surface.
+
+- Brighter areas indicate greater modeled liquidation density
+- Long-liquidation structure is below the relevant market price
+- Short-liquidation structure is above it
+- Persistent horizontal areas show levels that have remained active through time
+
+Hover the chart for the available value and metadata. Model-derived values are shown as approximate.
+
+## Historical and live data
+
+TradeNet loads binary heatmap history in tiles, then continues with live data.
+
+The loader tracks actual frame coverage. If a tile range contains an interior gap, the terminal can request that missing area instead of marking the entire envelope complete.
+
+## Model impact levels
+
+Impact levels are a filtered view of current liquidation structure. They highlight modeled levels that are more likely to matter if price reaches them.
+
+Each level has an impact score from 0 to 1. The score considers the live model state and observed liquidation behavior. It is a probability-like model output, not certainty.
+
+The bands:
+
+- Begin where the tracked level formed
+- Extend toward the live edge
+- Show how long the level has persisted
+- Can include observed liquidation confirmation
+- Hide when the live source is stale
+
+The model bands toggle is available in liquidation heatmap settings.
+
+## Warmup and staleness
+
+Impact levels are live-only.
+
+After a service restart, they need time to rebuild enough live state. They can disappear temporarily during warmup or when the feed is stale. That is intentional.
+
+<Warning>
+Do not read impact score as a guaranteed reaction or as a strict ranking between very close levels. A level can be reached, swept, ignored, or traded through.
+</Warning>
+
+## Combine it with other tools
+
+The heatmap becomes more useful when compared with:
+
+- Orderbook depth
+- Liquidation events
+- Open-interest changes
+- Footprint aggression
+- Volume and OI CVD
+
+Read [Using the Liquidation Heatmap](/guides/reading-the-heatmap) for a practical workflow.
+
+> **Screenshot placeholder:** [Picture of the liquidation heatmap with one approximate cell tooltip and two impact bands, with long side, short side, band age, impact score, stale protection, and the model toggle annotated.]

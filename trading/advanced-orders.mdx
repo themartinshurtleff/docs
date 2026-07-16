@@ -1,0 +1,113 @@
+---
+title: "Advanced Orders"
+description: "Use Scaled, TWAP, Chase, Iceberg, and Swarm strategies in paper mode"
+---
+
+# Advanced Orders
+
+Advanced orders break one intention into managed child orders.
+
+During the public beta, normal accounts run them through paper trading.
+
+## Enable strategy orders
+
+Open the **Strategies** tab in the bottom dock and enable strategy orders, or select an advanced ticket from the Trade pane.
+
+## Scaled
+
+Scaled creates a ladder of limit orders across a price range.
+
+Configure:
+
+- Total target size
+- Low and high price
+- Number of rungs
+- Price distribution
+- Size distribution
+- Reduce-only
+- Exit policy
+
+Use it when you want to build or reduce exposure across a zone instead of at one price.
+
+## TWAP
+
+TWAP divides the target into scheduled slices over time.
+
+Configure:
+
+- Duration
+- Number of slices
+- Market or Chase child type
+- Optional price guard
+- Timeout and failure behavior
+- Reduce-only
+- Exit policy
+
+## Chase
+
+Chase manages a limit order relative to the market.
+
+Configure:
+
+- Own-side or aggressive opposite-side peg
+- Maintain or trail mode
+- Tick or percentage distance
+- Reprice timing
+- Give-up behavior
+- Reduce-only
+- Exit policy
+
+## Iceberg
+
+Iceberg exposes only a smaller visible child while working a larger target.
+
+Configure:
+
+- Total target size
+- Visible child size
+- Fixed or pegged price mode
+- Fixed price or offset
+- Reduce-only
+- Exit policy
+
+## Swarm
+
+Swarm splits the target into many smaller child orders.
+
+Configure:
+
+- Number of lots
+- Irregular sizing
+- Reduce-only
+- Exit policy
+
+## Exit policy
+
+Advanced orders are managed by the client.
+
+Choose what should happen when the app or tab closes:
+
+- **Close on exit** cancels the managed strategy's remaining work
+- **Keep open** leaves already placed venue orders open where the active route supports it
+
+For paper beta use, keep the desktop app open while a strategy is active.
+
+## Monitoring
+
+The Strategies dock shows:
+
+- Target, placed, and filled amount
+- Progress
+- Child orders
+- Status
+- Next action
+- Exit policy
+- Activity and errors
+
+You can pause, resume, cancel, or panic from the same tab.
+
+> **Screenshot placeholder:** [Composite picture of the five advanced-order ticket types and one expanded Strategies row, with the main parameters and child-order ledger annotated.]
+
+<Warning>
+Advanced execution does not create liquidity. A backtest or paper fill can be cleaner than a live venue fill because queue position, partial fills, depth, and slippage are simplified.
+</Warning>

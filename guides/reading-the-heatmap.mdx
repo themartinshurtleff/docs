@@ -1,0 +1,67 @@
+---
+title: "Using the Liquidation Heatmap"
+description: "A practical workflow for reading liquidation structure without treating it as a signal generator"
+---
+
+# Using the Liquidation Heatmap
+
+The heatmap is context. It tells you where modeled forced flow may become relevant. It does not tell you exactly when to enter.
+
+## Start with structure
+
+Zoom out enough to see:
+
+- The nearest meaningful cluster above price
+- The nearest meaningful cluster below price
+- Which side is denser
+- Which levels have persisted
+- Whether current price is moving toward or away from them
+
+Do not begin by staring at the brightest single pixel.
+
+## Check whether the level is current
+
+Before using an impact band:
+
+- Confirm the feed is healthy
+- Confirm the band is not withheld as stale
+- Allow warmup time after a restart
+- Read modeled size as approximate
+
+## Compare effort and result
+
+Use footprint and CVD to ask whether aggressive flow is producing price movement.
+
+Examples:
+
+- Strong aggressive buying with little upward progress can mean absorption
+- Falling price with contracting OI can mean positions are closing instead of fresh shorts entering
+- Rising OI into a nearby downside liquidation area can add fuel, but direction still needs confirmation
+
+## Compare the orderbook
+
+An orderbook heatmap or Orderbook pane shows resting liquidity.
+
+A liquidation level aligned with thin depth may allow faster movement. A large resting wall can absorb, slow, or redirect the move. It can also be pulled.
+
+## Watch actual liquidation events
+
+Liquidation bubbles show observed events. They help answer whether projected structure is beginning to resolve into real forced orders.
+
+Remember that not every venue reports the exact execution price. Read [Liquidation Events](/features/liquidation-events) before treating every bubble as an exact tick.
+
+## Build a trade plan
+
+A basic plan should define:
+
+1. The level that matters
+2. The condition that confirms your idea
+3. The condition that invalidates it
+4. The stop location
+5. The target and expected path
+
+The heatmap gives you candidate structure. The rest of the terminal helps determine whether the market is actually trading the way your plan requires.
+
+<Tip>
+Paper trade the same setup repeatedly before assigning money to it. Save screenshots and note what OI, delta, CVD, footprint, and resting liquidity looked like before the level was reached.
+</Tip>

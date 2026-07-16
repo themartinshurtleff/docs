@@ -1,0 +1,74 @@
+---
+title: "Orderbook Heatmap"
+description: "Track resting bid and ask depth across price and time"
+---
+
+# Orderbook Heatmap
+
+The orderbook heatmap shows how resting liquidity changes over time.
+
+It is built from aggregated depth across supported venues and rendered behind the chart.
+
+## Turn it on
+
+Select a chart pane and choose **Orderbook** from the heatmap control.
+
+The settings panel includes:
+
+- Theme
+- Automatic, SD, or HD resolution
+- Intensity
+- Opacity
+- Minimum notional
+- Aggregated venue set
+
+TradeNet currently aggregates supported Binance, Bybit, and OKX orderbook data for this layer.
+
+## What the colors mean
+
+Brighter levels contain more resting notional after the current filtering and intensity settings.
+
+The history lets you see:
+
+- Liquidity building
+- Liquidity being pulled
+- Walls moving with price
+- Repeated replenishment
+- Thin zones where price may move more freely
+
+Resting liquidity is not a promise. Orders can be canceled before price reaches them.
+
+## Resolution
+
+Use:
+
+- **Auto** for scale-aware resolution
+- **SD** for a lighter view
+- **HD** for more detail
+
+HD can be useful close to price, but more detail is not always more readable.
+
+## Venue selection
+
+The orderbook heatmap has its own supported venue set. You can compare a chosen subset or keep the same set used across the rest of the pane.
+
+## Hover values
+
+Where raw historical values are available, the terminal can show exact resting notional. Approximate or aggregated values are labeled rather than presented as raw exchange truth.
+
+## How to use it
+
+Compare resting depth with:
+
+- Tape aggression
+- Footprint imbalances
+- Liquidation structure
+- Price reaction
+
+A wall that repeatedly absorbs aggressive prints is different from a wall that disappears as price approaches.
+
+> **Screenshot placeholder:** [Picture of the orderbook heatmap with one persistent wall, one pulled wall, one thin zone, and the venue-set control annotated.]
+
+<Warning>
+The orderbook is cancelable intent. Do not treat a visible wall as guaranteed support or resistance.
+</Warning>

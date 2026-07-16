@@ -1,0 +1,111 @@
+---
+title: "Data Quality and Labels"
+description: "Understand exact, approximate, modeled, partial, stale, and live-only terminal data"
+---
+
+# Data Quality and Labels
+
+TradeNet combines raw exchange data, aggregated server data, frontend calculations, and model output.
+
+They are not the same thing.
+
+## Exact
+
+Exact means the displayed value comes from retained raw values at the stated source and resolution.
+
+Examples can include:
+
+- Raw USD heatmap frames
+- Binance liquidation execution price
+- Footprint buy and sell quantities
+- Server-owned aggregated bar stats where coverage exists
+
+## Approximate
+
+Approximate values are marked with `~`, an estimate label, or equivalent context.
+
+Examples include:
+
+- Heatmap render-intensity values without retained raw USD
+- Candle-estimated volume profiles
+- Bybit or OKX liquidation event price placement when the exact execution tick is not provided
+- Model liquidation size
+
+Do not remove the approximate label in a custom script or screenshot.
+
+## Modeled
+
+Modeled data is calculated from observed inputs.
+
+Examples include:
+
+- Liquidation heatmap projections
+- Liquidation impact score
+- Net Positioning
+
+Modeled output can be useful and still be wrong. It should never be described as exchange-reported fact.
+
+## Partial
+
+Partial means only part of the requested range or venue set was available.
+
+Examples include:
+
+- A profile with some candles missing footprint levels
+- Light backtesting with footprint coverage over only part of the range
+- A historical heatmap range with a gap still being repaired
+
+TradeNet reports coverage instead of filling missing data with zeros.
+
+## Missing
+
+`nil`, blank, or unavailable does not mean zero.
+
+This is common for:
+
+- OI before retained history begins
+- Bar-stat rows outside loaded history
+- Footprint levels outside retained coverage
+- Live-only APIs during backtests
+
+## Stale
+
+Stale means the source has not updated recently enough to trust as current.
+
+Live liquidation impact levels are withheld when their snapshot is stale. The terminal can also show feed-health problems in the status area.
+
+## Live-only
+
+Live-only data cannot be reconstructed as a reliable historical series.
+
+Examples include:
+
+- Sub-minute custom timeframe history
+- L1 best bid, best ask, spread, and microprice
+- Current liquidation live pools
+- Current liquidation impact levels
+
+## Units
+
+Read the unit label.
+
+- Aggregated candle volume and delta commonly use USD notional
+- Footprint quantities use base asset
+- OI level is retained in base units
+- The native OI row displays USD using candle price
+- OI Delta, Daily OI CVD, and liquidation rows use USD
+- Heatmap intensity is relative and is not USD
+
+## Data-source checklist
+
+Before using a value, ask:
+
+1. Is it observed or modeled?
+2. Is it exact or approximate?
+3. What are the units?
+4. Which venues are included?
+5. Is the range complete?
+6. Is it current or stale?
+7. Is it available in backtests?
+
+That habit prevents most serious interpretation mistakes.

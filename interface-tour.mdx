@@ -1,0 +1,90 @@
+---
+title: "Interface Tour"
+description: "Learn the TradeNet shell, toolbars, panes, dock, and status areas"
+---
+
+# Interface Tour
+
+TradeNet is organized around a selected pane. Click a pane, and the toolbar directly below the top bar changes to control that pane.
+
+## Top bar
+
+The top bar contains:
+
+- Connection and feed status
+- The **WORKSPACES** menu
+- A trading **HALTED** indicator when the global kill switch is active
+- The current UTC or local clock
+- Desktop window controls
+
+## Selected-pane toolbar
+
+The second row under the top bar controls the active pane. Depending on the pane, it can contain:
+
+- Market and exchange
+- Timeframe
+- Candlestick or footprint chart style
+- Liquidation, orderbook, or disabled heatmap mode
+- Indicators and chart settings
+- Pane linking
+- Lua controls
+- Orderbook-specific controls
+
+Always select the pane you intend to change before using this toolbar.
+
+## Left rail
+
+The left rail opens major terminal surfaces:
+
+- **Workspace**
+- **Markets** screener
+- **Trade**
+- **Chart theme**
+- **Lua Editor**
+- **Settings**
+
+The lower part of the rail contains:
+
+- Docked split mode
+- Freeform canvas mode
+- Add Chart
+- Add Orderbook
+- Add Tape
+- Add Indicator
+- Add Trade pane
+- Add Backtester
+
+The drawing button in the main rail points you toward the drawing toolbar inside chart panes.
+
+## Pane header and tabs
+
+Each pane has a header and can contain one or more browser-style tabs. Tabs can be reordered, grouped, split into another area, or detached back into their own pane.
+
+The selected tab controls what appears in the pane and which controls appear in the selected-pane toolbar.
+
+## Chart drawing toolbar
+
+Chart panes have a vertical drawing toolbar on the left edge. Hover a grouped tool to open its variants. The lock button keeps the active tool selected after a drawing is placed.
+
+## Bottom order-management dock
+
+The dock spans the bottom of the terminal and can be expanded, collapsed, and resized.
+
+Its tabs are:
+
+- Positions
+- Open Orders
+- Order History
+- Trade History
+- Position History
+- Strategies
+
+The Strategies tab monitors advanced orders and armed Lua algos.
+
+## Status bar
+
+The status area reports the health of active data feeds and desktop services. Use it as the first check when a chart, heatmap, orderbook, or tape stops updating.
+
+## Settings
+
+Settings contains account controls, timezone selection, aggregation preferences, strategy-order behavior, diagnostics, version information, and manual update checks.

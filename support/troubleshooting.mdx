@@ -1,0 +1,149 @@
+---
+title: "Troubleshooting"
+description: "Fix common beta login, data, layout, trading, Lua, backtest, and update problems"
+---
+
+# Troubleshooting
+
+Beta software will have rough edges. Start with the simplest checks and keep the exact error message.
+
+## Cannot sign in
+
+1. Confirm the same credentials work on the TradeNet website
+2. Confirm the email is verified
+3. Use password recovery if needed
+4. Close and reopen the terminal
+5. Sign in again without an old remembered session
+
+If authentication succeeds but access is denied, the account may not have an active terminal entitlement.
+
+## Chart is blank
+
+- Select the pane
+- Choose a known aggregated market such as BTC
+- Use a standard timeframe such as 1 minute or 5 minutes
+- Check the feed status
+- Switch from Footprint to Candlesticks to isolate footprint coverage
+- Reset the chart view
+
+## Footprint has blank candles
+
+Footprint history loads separately from OHLC.
+
+- Keep the missing range visible briefly
+- Avoid repeatedly jumping between far-apart ranges
+- Confirm the selected market supports the footprint source
+- Check whether the missing area is outside retained coverage
+
+## Heatmap has gaps or no impact bands
+
+- Confirm the correct heatmap is enabled
+- Check feed status
+- Reduce minimum notional
+- Use Auto resolution
+- Allow historical tiles to load
+- Allow impact levels to warm up after a restart
+- Remember that impact bands hide when stale
+
+## Orderbook or tape stopped moving
+
+- Confirm the pane is linked to the intended market
+- Recenter the Orderbook
+- Check the minimum-size filters
+- Check the selected venue set
+- Inspect the status area and diagnostics
+- Restart the terminal if the feed does not recover
+
+## Pane changed the wrong market
+
+The selected-pane toolbar targets the pane you last selected.
+
+Click the intended pane first, then change the market. Check the link control if multiple panes changed together.
+
+## Layout is difficult to recover
+
+- Load a saved workspace
+- Switch between docked split and canvas mode
+- Detach or regroup tabs
+- Use a named template before making another large rearrangement
+
+## Paper order is rejected
+
+Check:
+
+- Trading is not HALTED
+- The Trade panel is in simulated mode
+- Size is valid
+- A limit price is present for a limit order
+- Reduce-only matches an existing position
+- Lua or advanced-order rails are not blocking it
+
+## Advanced strategy stopped
+
+Open the Strategies tab and inspect:
+
+- Status
+- Next action
+- Child ledger
+- Activity
+- Error
+- Exit policy
+
+The desktop app must remain open for client-managed strategy behavior.
+
+## Lua script does not appear
+
+- Save it from the Lua Editor
+- Confirm it is a `.lua` user file
+- Choose Validate
+- Read Problems
+- Reopen the editor to refresh external file changes
+
+## Lua script shows an error
+
+- Read the Problems or Logs tab
+- Check zero-based indexing
+- Nil-guard missing data
+- Remove unsupported libraries
+- Reduce compute work
+- Reduce drawing commands
+- Confirm the method exists in the current reference
+
+## Backtest shows no trades
+
+This can be a valid result.
+
+- Read the warning strip
+- Use a longer range
+- Try another timeframe
+- Confirm entries use confirmed bars
+- Confirm the script does not depend entirely on live-only data
+- Check the Data tab for footprint or source limitations
+
+## Update cannot restart
+
+Close or resolve:
+
+- Positions
+- Orders
+- Advanced strategies
+- Armed Lua algos
+- Unsaved Lua drafts
+
+Then return to Settings and retry the install.
+
+## What to send TradeNet
+
+Include:
+
+- App version
+- Windows version
+- Exact message
+- Symbol and timeframe
+- Pane type
+- What you clicked before the problem
+- Whether it survives a restart
+- Relevant diagnostics or logs
+- One focused screenshot
+
+Do not send exchange secrets, passwords, refresh tokens, or private keys.

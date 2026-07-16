@@ -1,0 +1,252 @@
+---
+title: "Lua Examples and Recipes"
+description: "Working patterns for TradeNet panels, overlays, footprint signals, and alerts"
+---
+
+# Lua Examples and Recipes
+
+These examples use the current Tauri API. Start with one small behavior, validate it, add it to a pane, and inspect Logs before combining several data sources.
+
+## Reset-aware Daily CVD
+
+This panel uses TradeNet's Daily CVD series and breaks the line at UTC midnight. Missing values stay missing instead of becoming zero.
+
+```lua
+return {
+    name = "Daily CVD",
+    mode = "panel",
+
+    compute = function(ctx)
+        local last_session = nil
+
+        for i = 0, ctx.candle_count() - 1 do
+            local value = ctx.daily_cvd(i)
+            if value ~= nil then
+                local session = ctx.session_id(i, 0)
+
+                if last_session ~= nil and session ~= last_session then
+                    ctx.break_before(i)
+                end
+
+                ctx.set_value(i, value)
+                last_session = session
+            end
+        end
+    end,
+
+    draw = function(ctx)
+        ctx.draw_hline(0, "rgba(255,255,255,0.25)", 1, "solid")
+    end,
+}
+```
+
+Why it is written this way:
+
+- `daily_cvd` can be sparse, so it is nil-guarded
+- `session_id(i, 0)` identifies the UTC day
+- `break_before(i)` prevents a false connecting line across the reset
+- The whole primary series is rebuilt on every compute
+
+## SMA crossover marks
+
+This overlay marks a 9 and 20 SMA cross. It draws circles directly in price space.
+
+```lua
+return {
+    name = "SMA Cross Marks",
+    mode = "overlay",
+
+    compute = function(ctx)
+    end,
+
+    draw = function(ctx)
+        for i = 20, ctx.candle_count() - 1 do
+            local fast = ctx.sma("close", 9, i)
+            local slow = ctx.sma("close", 20, i)
+            local fast_prev = ctx.sma("close", 9, i - 1)
+            local slow_prev = ctx.sma("close", 20, i - 1)
+
+            if fast and slow and fast_prev and slow_prev then
+                if fast > slow and fast_prev <= slow_prev then
+                    ctx.draw_circle(i, ctx.low(i), 4, "#36d399")
+                elseif fast < slow and fast_prev >= slow_prev then
+                    ctx.draw_circle(i, ctx.high(i), 4, "#ff5d73")
+                end
+            end
+        end
+    end,
+}
+```
+
+This is intentionally simple. Repeated moving-average calls over long histories are acceptable for a small example, but a heavier script should cache values or maintain efficient state.
+
+## Footprint absorption guard
+
+This overlay declares footprint data, sums every loaded price row, and labels a bullish candle with much heavier sell quantity.
+
+```lua
+return {
+    name = "Footprint Absorption",
+    mode = "overlay",
+    requires = { footprint = true },
+
+    compute = function(ctx)
+    end,
+
+    draw = function(ctx)
+        for i = 0, ctx.candle_count() - 1 do
+            local fp = ctx.footprint(i)
+            if fp ~= nil then
+                local buy = 0
+                local sell = 0
+                local j = 0
+
+                while fp[j] ~= nil do
+                    buy = buy + fp[j].buy_qty
+                    sell = sell + fp[j].sell_qty
+                    j = j + 1
+                end
+
+                local open = ctx.open(i)
+                local close = ctx.close(i)
+
+                if open and close and sell > buy * 3 and close > open then
+                    ctx.draw_label(i, ctx.low(i), "ABS", "#ffcc66", 10)
+                end
+            end
+        end
+    end,
+}
+```
+
+This is a visual condition, not a finished trading strategy. Footprint quantities are base asset, and historical footprint coverage can be partial.
+
+## Event-driven stop alert
+
+This script uses one event id as both persistent state and the popup key. Recomputing the same chart does not repeat the alert.
+
+```lua
+return {
+    name = "Stop Alert",
+    mode = "overlay",
+
+    compute = function(ctx)
+        local hit = ctx.last_tpsl_hit({ type = "sl_hit" })
+        if hit == nil then
+            return
+        end
+
+        if ctx.state.last_event_id ~= hit.id then
+            ctx.popup("Stop loss filled", {
+                key = "sl:" .. hit.id,
+                title = "Risk Alert",
+                duration_ms = 5000,
+                border_color = "#ff4d61",
+                title_color = "#ff9aaa",
+                font_size = 24,
+                width = 420,
+            })
+
+            ctx.state.last_event_id = hit.id
+        end
+    end,
+
+    draw = function(ctx)
+    end,
+}
+```
+
+## Confirmed-bar signal pattern
+
+For signals that should match replay behavior, evaluate the most recent closed candle:
+
+```lua
+local i = ctx.candle_count() - 2
+if i < 1 or not ctx.is_confirmed(i) then
+    return
+end
+
+local signal_time = ctx.time(i)
+```
+
+The newest candle is live. Its condition can disappear before close.
+
+## Missing-data fallback pattern
+
+Do not silently turn missing data into zero. Either skip the signal or use a clearly stated proxy:
+
+```lua
+local delta = ctx.delta(i)
+
+if delta == nil then
+    local buy = ctx.buy_volume(i)
+    local sell = ctx.sell_volume(i)
+    if buy ~= nil and sell ~= nil then
+        delta = buy - sell -- stated candle-volume proxy
+    end
+end
+
+if delta == nil then
+    return
+end
+```
+
+## Exact heatmap pattern
+
+Require exact USD before using a dollar label:
+
+```lua
+local depth, exact = ctx.ob_depth(i, "bid", 0.5)
+
+if depth ~= nil and exact then
+    ctx.set_readout(string.format("Bid depth: $%.0f", depth))
+else
+    ctx.set_readout("Bid depth: unavailable or relative")
+end
+```
+
+For a visual intensity signal, you can use `exact = false`, but keep the label unitless.
+
+## Efficient visible drawing
+
+Use the viewport only to reduce drawing work. Keep the actual computation independent of it.
+
+```lua
+local first, last = ctx.visible_range()
+first = math.max(0, first or 0)
+last = math.min(ctx.candle_count() - 1, last or (ctx.candle_count() - 1))
+
+for i = first, last do
+    -- visible drawing only
+end
+```
+
+The exact upper-bound behavior can differ between tracked and fallback ranges, so one extra attempted index should never affect correctness.
+
+## Skip drawing in replay
+
+Backtests need the signal and order intents, not thousands of decorative chart commands:
+
+```lua
+draw = function(ctx)
+    if ctx.is_backtest() then
+        return
+    end
+
+    -- live chart drawings
+end
+```
+
+## Before sharing a script
+
+1. Validate it in the editor.
+2. Run it on aggregated and venue panes if both are supported.
+3. Test a symbol or timeframe with missing optional data.
+4. Confirm every volume and quantity unit.
+5. Confirm heatmap exactness before displaying currency.
+6. Check the live candle for repaint behavior.
+7. Save the source and confirm the active instance reloads cleanly.
+8. Backtest any strategy and read the Data tab warnings.
+9. Paper trade with tight rails before leaving an algo armed.
+
+> **Screenshot placeholder:** [Two-pane chart screenshot showing one overlay Lua indicator and one panel Lua indicator. Annotate the indicator names, panel readout, one plotted signal, and the chart control used to identify or remove each Lua instance.]

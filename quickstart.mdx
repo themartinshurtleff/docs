@@ -1,0 +1,55 @@
+---
+title: "Quick Start"
+description: "Build a useful first TradeNet workspace in a few minutes"
+---
+
+# Quick Start
+
+This guide gets you from a fresh install to a usable order-flow workspace. It does not try to teach the entire terminal at once.
+
+<Steps>
+  <Step title="Sign in">
+    Launch TradeNet Terminal and sign in with your TradeNet account. Leave **Remember me** enabled on a trusted personal machine.
+  </Step>
+  <Step title="Start with aggregated BTC">
+    Select the chart pane, open the market menu in the selected-pane toolbar, choose **AGG**, then choose **BTC**.
+
+    Aggregated BTC combines supported venues and has the broadest set of TradeNet data layers.
+  </Step>
+  <Step title="Choose split or canvas mode">
+    Use the layout buttons near the bottom of the left rail.
+
+    **Docked split** keeps panes in a resizable grid. **Freeform canvas** lets you place and resize panes on a larger scrollable surface.
+  </Step>
+  <Step title="Add an orderbook and tape">
+    Use the quick-add buttons on the left rail to add an **Orderbook** pane and a **Time & Sales** pane.
+
+    Keep the panes linked if you want them to follow the selected market.
+  </Step>
+  <Step title="Configure the chart">
+    Set the chart style to **Candlesticks** or **Footprint**. Add **Footprint Bar Stats**, **Daily CVD**, and **Open Interest** from the indicator browser.
+  </Step>
+  <Step title="Turn on a heatmap">
+    Choose **Liquidation** or **Orderbook** from the chart heatmap control. Open the settings gear to adjust theme, resolution, intensity, opacity, and minimum notional.
+  </Step>
+  <Step title="Save the workspace">
+    Open **WORKSPACES** in the top bar, name the current setup, and save it. Star the template if you want it to load when TradeNet starts.
+  </Step>
+  <Step title="Try a paper order">
+    Open the Trade panel from the left rail. Confirm the panel shows simulated or paper mode, choose a small margin amount, review the order preview, and place a market or limit order.
+  </Step>
+</Steps>
+
+> **Screenshot placeholder:** [Full terminal screenshot with the left rail, selected-pane toolbar, chart, Orderbook pane, Time & Sales pane, WORKSPACES menu, and bottom order-management dock outlined and annotated.]
+
+## What to learn next
+
+- [Interface Tour](/interface-tour) for the full shell
+- [Panes, Tabs, and Linking](/guides/panes-tabs-and-linking) for workspace control
+- [Footprint Charts](/features/footprint-charts) for reading the inside of each candle
+- [Liquidation Heatmap](/features/liquidation-heatmap) for projected liquidation structure
+- [Paper Trading](/trading/getting-started) before testing advanced orders or Lua automation
+
+<Note>
+Some historical data loads only when it is needed. If you scroll into an unloaded range, give the terminal a moment to request and fill it. Missing or approximate data is labeled where possible.
+</Note>

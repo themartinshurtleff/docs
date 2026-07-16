@@ -1,0 +1,693 @@
+---
+title: "Lua Scripting Reference"
+description: "Complete public beta API reference for TradeNet indicators and strategies"
+---
+
+# Lua Scripting Reference
+
+This is the public Lua surface in the current Tauri terminal.
+
+All candle indexes and returned data tables are zero-based. Index `0` is the oldest loaded candle. Use explicit numeric loops instead of `ipairs()` or `#`.
+
+Read [Runtime and Data Model](/indicators/runtime-and-data) first if you are unfamiliar with pane ownership, units, exactness, requirements, or the 250ms change-gated lifecycle.
+
+## Module shape
+
+```lua
+return {
+    name = "Indicator Name",
+    mode = "overlay", -- or "panel"
+
+    settings = {},
+    requires = {},
+
+    compute = function(ctx)
+    end,
+
+    draw = function(ctx)
+    end,
+}
+```
+
+`name`, `mode`, `compute`, and `draw` are required.
+
+## Metadata and pane context
+
+| Method | Return |
+| --- | --- |
+| `ctx.candle_count()` | Loaded candle count |
+| `ctx.timeframe()` | Pane timeframe in milliseconds |
+| `ctx.symbol()` | Current aggregated or venue instrument symbol |
+| `ctx.exchange()` | Display exchange label |
+| `ctx.tick_size()` | Pane instrument tick size |
+| `ctx.exchange_set()` | Raw venue id such as `agg`, `binance`, `bybit`, `okx`, or `hyperliquid` |
+| `ctx.is_aggregated()` | True only for an aggregated pane |
+| `ctx.volume_unit()` | `usd` on aggregated panes or `base` on venue panes |
+| `ctx.oi_unit()` | `base` |
+| `ctx.visible_range()` | Two values: advisory first and last visible indexes |
+
+Current `ctx.exchange()` labels include `Aggregated`, `BinanceLinear`, `BybitLinear`, `OkexLinear`, and `HyperliquidLinear`.
+
+<Warning>
+Venue candle volume accessors currently contain USD notional even though `ctx.volume_unit()` returns `base` there. Treat the candle volume accessors as USD notional in this beta.
+</Warning>
+
+## Candle access
+
+Each method accepts a zero-based candle index and returns a number or `nil`.
+
+| Method | Meaning |
+| --- | --- |
+| `ctx.open(i)` | Open price |
+| `ctx.high(i)` | High price |
+| `ctx.low(i)` | Low price |
+| `ctx.close(i)` | Close or latest price |
+| `ctx.volume(i)` | Total USD notional |
+| `ctx.buy_volume(i)` | Buy USD notional |
+| `ctx.sell_volume(i)` | Sell USD notional |
+| `ctx.time(i)` | Candle-open timestamp in Unix milliseconds |
+
+## Bar statistics
+
+| Method | Return and behavior |
+| --- | --- |
+| `ctx.delta(i)` | Buy minus sell USD notional. Aggregated missing data stays `nil`; venue panes can fall back to buy minus sell volume. |
+| `ctx.daily_cvd(i)` | UTC daily volume CVD where loaded |
+| `ctx.cvd_24h(i)` | Alias of `daily_cvd`, not rolling 24-hour CVD |
+| `ctx.oi_delta(i)` | Prefers USD OI Delta. A fallback can be only adjacent base-OI difference, so do not assume every result is exact USD. |
+| `ctx.daily_oi_cvd(i)` | UTC daily OI CVD where loaded |
+| `ctx.oi_cvd(i)` | Alias of `daily_oi_cvd` |
+| `ctx.liq_short(i)` | Short liquidation USD notional from bar stats or matching events |
+| `ctx.liq_long(i)` | Long liquidation USD notional from bar stats or matching events |
+
+All rows can be sparse. Guard `nil`.
+
+## Candle state and sessions
+
+| Method | Return |
+| --- | --- |
+| `ctx.is_live(i)` | True only for the newest loaded candle |
+| `ctx.is_confirmed(i)` | True for valid candles before the newest |
+| `ctx.session_id(i, reset_hour_utc)` | Integer session bucket or `nil` |
+| `ctx.is_session_reset(i, reset_hour_utc)` | True when `i` starts a new session |
+| `ctx.is_utc_day_reset(i)` | Shortcut for a midnight UTC boundary |
+
+The reset hour is normalized modulo 24.
+
+```lua
+if ctx.is_session_reset(i, 0) then
+    ctx.break_before(i)
+end
+```
+
+## Footprint and volume at price
+
+Declare `requires = { footprint = true }`.
+
+### `ctx.footprint(i)`
+
+Returns a zero-based table or `nil`:
+
+```lua
+{
+    [0] = {
+        price = 65000.0,
+        buy_qty = 1.25,
+        sell_qty = 0.80,
+        buy_count = 12,
+        sell_count = 9,
+    },
+}
+```
+
+Quantities are base asset. The table has no `count` field.
+
+```lua
+local rows = ctx.footprint(i)
+if rows ~= nil then
+    local j = 0
+    while rows[j] ~= nil do
+        local row = rows[j]
+        j = j + 1
+    end
+end
+```
+
+### `ctx.traded_at_price(i, price, width_ticks?)`
+
+Sums footprint activity within the optional tick width:
+
+```lua
+{
+    buy_qty = 1.25,
+    sell_qty = 0.80,
+    trade_count = 21,
+}
+```
+
+Returns `nil` when no matching footprint data exists.
+
+### `ctx.vap(from_i, to_i, tick?)`
+
+Builds a 70 percent value-area profile over the inclusive candle range using footprint data already loaded in the pane.
+
+```lua
+{
+    levels = {
+        [0] = { price = 64995, buy_qty = 2.1, sell_qty = 1.7 },
+    },
+    level_count = 42,
+    poc = 65010,
+    vah = 65055,
+    val = 64970,
+    total_qty = 123.45,
+    covered = 60,
+    missing = 3,
+}
+```
+
+The optional tick re-buckets prices. Check `covered` and `missing` before treating the profile as complete.
+
+### `ctx.session_levels(i, reset_hour_utc)`
+
+Builds a point-in-time profile from the current session start through candle `i`. It never inspects future candles.
+
+```lua
+{
+    poc = 65010,
+    vah = 65055,
+    val = 64970,
+    high = 65120,
+    low = 64880,
+    open = 64920,
+    first_i = 0,
+    last_i = i,
+}
+```
+
+POC, VAH, and VAL can be `nil` when footprint coverage is unavailable.
+
+## Liquidation data
+
+Declare `requires = { liq_heatmap = true }`.
+
+| Method | Return |
+| --- | --- |
+| `ctx.has_liq_heatmap()` | Whether decoded tiles or a live model snapshot exists |
+| `ctx.liq_fuel(i, direction, band_pct)` | Two values: heatmap value and exact flag for `above` or `below` price |
+| `ctx.liq_levels(i, opts?)` | Ranked visual heatmap buckets |
+| `ctx.liq_nearest(i, direction, min_share?)` | Nearest qualifying region above or below price |
+| `ctx.liq_frame_meta(i)` | Frame time, end, price step, exactness, and source |
+| `ctx.liq_live_pools()` | Current model pools, not historical per-candle state |
+| `ctx.liq_events(i)` | Observed liquidation events inside the candle |
+| `ctx.liq_impact_levels()` | Current model-scored impact levels |
+
+### `ctx.liq_levels(i, opts?)`
+
+```lua
+local levels = ctx.liq_levels(i, {
+    top_n = 32,       -- clamped 1..256
+    range_pct = 5.0,
+    side = "both",   -- "both", "long", or "short"
+})
+```
+
+Return shape:
+
+```lua
+{
+    count = N,
+    [0] = {
+        price = number,
+        long = number,
+        short = number,
+        unit = "usd" or "intensity",
+        exact = boolean,
+    },
+}
+```
+
+<Warning>
+Decoded flat tiles do not preserve independent long and short values. In the current build, `both` and `long` place visual magnitude in `long`, while `short` remains zero. Do not use `liq_levels` for directional notional.
+</Warning>
+
+### `ctx.liq_nearest(i, direction, min_share?)`
+
+`direction` is `above` or `below`. `min_share` defaults to `0.2` and is clamped from 0 to 1.
+
+```lua
+{
+    price_low = number,
+    price_high = number,
+    notional = number,
+    side = "short" or "long",
+    distance_pct = number,
+    unit = "usd" or "intensity",
+    exact = boolean,
+}
+```
+
+Above price is inferred as short-liquidation fuel. Below price is inferred as long-liquidation fuel.
+
+### `ctx.liq_frame_meta(i)`
+
+```lua
+{
+    t = frame_start_ms,
+    t_end = frame_end_ms,
+    step = price_grid_step,
+    exact_frame = boolean,
+    source = "tile" or "live",
+}
+```
+
+When no frame exists, it returns `{ source = "none" }`.
+
+### `ctx.liq_live_pools()`
+
+```lua
+{
+    count = N,
+    [0] = {
+        price = number,
+        price_low = number,
+        price_high = number,
+        notional_usd = number,
+        intensity = number,
+        bucket_count = number,
+        side = "long" or "short",
+    },
+}
+```
+
+This is current live model state, not archived candle history.
+
+### `ctx.liq_events(i)`
+
+```lua
+{
+    count = N,
+    [0] = {
+        ts = unix_ms,
+        side = "long" or "short",
+        notional_usd = number,
+        price = number or nil,
+        price_is_execution = boolean,
+        exchange = string,
+    },
+}
+```
+
+### `ctx.liq_impact_levels()`
+
+Returns up to 24 current model rows:
+
+```lua
+{
+    count = N,
+    touch_rate = number or nil,
+    [0] = {
+        price = number,
+        side = "long" or "short",
+        usd = number or nil,
+        peak_usd = number or nil,
+        impact = number,
+        dual_source = boolean,
+        isolation = number or nil,
+        size_percentile = number or nil,
+        distance_pct = number or nil,
+        age_min = number or nil,
+    },
+}
+```
+
+`impact` is a model score from 0 to 1. Label it as modeled, not raw market truth.
+
+## Orderbook heatmap data
+
+Declare `requires = { ob_heatmap = true }`.
+
+| Method | Return |
+| --- | --- |
+| `ctx.has_ob_heatmap()` | Whether decoded orderbook tiles exist |
+| `ctx.ob_depth(i, side, band_pct, aggregation?)` | Two values: bid or ask depth and exact flag |
+| `ctx.ob_imbalance(i, band_pct)` | Exact-frame imbalance ratio and exact flag |
+| `ctx.ob_walls(i, side, top_n?, opts?)` | Strongest decoded levels |
+| `ctx.ob_level_history(price, i, lookback?)` | Presence and value across trailing frames |
+
+`ctx.ob_depth()` accepts `bid` or `ask`. Omit aggregation for the latest overlapping frame, or pass `max` for the largest matching band total among overlapping frames.
+
+`ctx.ob_imbalance()` returns this only for exact USD frames:
+
+```text
+(bid_depth - ask_depth) / (bid_depth + ask_depth)
+```
+
+It returns `nil, nil` for empty or intensity-only frames.
+
+### `ctx.ob_walls(i, side, top_n?, opts?)`
+
+The default `top_n` is 8 and the default range is 5 percent.
+
+```lua
+{
+    count = N,
+    [0] = {
+        price = number,
+        value = number,
+        unit = "usd" or "intensity",
+        base = nil,
+        exact = boolean,
+        persistence = 1,
+        side = "bid" or "ask",
+    },
+}
+```
+
+`persistence` is currently a constant placeholder of `1`. It is not a persistence or spoofing score.
+
+### `ctx.ob_level_history(price, i, lookback?)`
+
+The lookback defaults to 20 and is clamped from 1 to 500.
+
+```lua
+{
+    frames_present = integer,
+    frames_checked = integer,
+    mean_value = number,
+    max_value = number,
+    unit = "usd" or "intensity",
+    exact = boolean,
+}
+```
+
+## L1 and mark data
+
+Declare `requires = { l1 = true }`.
+
+| Method | Return |
+| --- | --- |
+| `ctx.has_l1()` | Whether a DOM snapshot exists |
+| `ctx.best_bid()` | Top or aggregate bid, or `nil` |
+| `ctx.best_ask()` | Top or aggregate ask, or `nil` |
+| `ctx.spread_bps()` | Spread in basis points, or `nil` |
+| `ctx.microprice()` | Top-level size-weighted microprice, or `nil` |
+| `ctx.mark_price()` | Pane latest price, or `nil` |
+| `ctx.funding_rate()` | Currently `nil` |
+| `ctx.next_funding_ts()` | Currently `nil` |
+| `ctx.oi_total()` | Latest OI at the current live or replay cursor |
+
+Most chart panes do not currently own a DOM snapshot, so `ctx.has_l1()` is often false.
+
+## Raw trades
+
+Declare `requires = { trades = true }`.
+
+| Method | Return |
+| --- | --- |
+| `ctx.has_trades()` | Whether the pane snapshot contains retained prints |
+| `ctx.trades(i, opts?)` | Prints inside one candle |
+| `ctx.large_trades(i, min_notional)` | Prints at or above a USD notional threshold |
+
+`ctx.trades(i, { limit = 5000 })` clamps the limit from 1 to 5,000.
+
+```lua
+{
+    count = N,
+    truncated = boolean,
+    [0] = {
+        ts = unix_ms,
+        price = number,
+        qty = base_quantity,
+        side = "long" or "short",
+        notional = usd_notional,
+        exchange = string,
+    },
+}
+```
+
+Trade side is `long` or `short`, not `buy` or `sell`.
+
+## Open interest
+
+Declare `requires = { oi = true }` when the script directly depends on host OI samples.
+
+| Method | Return |
+| --- | --- |
+| `ctx.oi(i)` | Last base-asset OI sample at or before the candle close, no older than one timeframe before its open |
+| `ctx.oi_unit()` | `base` |
+| `ctx.oi_total()` | Latest sample at the live or replay cursor |
+
+`ctx.oi_total()` is cursor-clamped during backtests to prevent lookahead.
+
+## Trading state and events
+
+Trading reads do not need a `requires` flag.
+
+| Method | Return |
+| --- | --- |
+| `ctx.has_trading()` | Whether trading is connected or positions/events exist |
+| `ctx.trading_connected()` | Current connection state |
+| `ctx.trading_simulated()` | Whether execution is simulated |
+| `ctx.trading_positions()` | Current positions table |
+| `ctx.trading_tpsl_orders()` | Current TP and SL orders table |
+| `ctx.trading_events(opts?)` | Filtered event table |
+| `ctx.last_trading_event(opts?)` | Latest matching row or `nil` |
+| `ctx.tpsl_hits(opts?)` | Filtered TP and SL hit table |
+| `ctx.last_tpsl_hit(opts?)` | Latest matching TP or SL hit, or `nil` |
+
+### Positions
+
+```lua
+{
+    count = N,
+    connected = boolean,
+    simulated = boolean,
+    [0] = {
+        position_id = string,
+        symbol = string,
+        side = "buy" or "sell",
+        qty = number,
+        entry_price = number,
+        mark_price = number or nil,
+        liquidation_price = number or nil,
+        unrealized_pnl = number,
+        leverage = number,
+        margin_mode = string,
+    },
+}
+```
+
+### TP and SL orders
+
+```lua
+{
+    count = N,
+    [0] = {
+        id = string,
+        position_id = string,
+        symbol = string,
+        tp_price = number or nil,
+        tp_qty = number or nil,
+        sl_price = number or nil,
+        sl_qty = number or nil,
+    },
+}
+```
+
+### Event filters and rows
+
+```lua
+local events = ctx.trading_events({
+    limit = 100,        -- clamped 1..250
+    type = "sl_hit",
+    symbol = "BTCUSDT",
+    position_id = "...",
+    since_ts = unix_ms,
+})
+```
+
+Known event types are `position_open`, `position_increase`, `manual_close`, `tp_hit`, and `sl_hit`.
+
+```lua
+{
+    id = string,
+    ts = unix_ms,
+    type = string,
+    simulated = boolean,
+    symbol = string,
+    position_id = string,
+    side = "long" or "short",
+    qty = number,
+    price = number,
+    entry_price = number,
+    pnl_usd = number,
+}
+```
+
+Event tables also contain `count`, `total_count`, `connected`, `simulated`, and `event_rev`.
+
+## Bulk series
+
+These methods allocate and return zero-based Lua tables:
+
+- `ctx.closes()`
+- `ctx.highs()`
+- `ctx.lows()`
+- `ctx.opens()`
+- `ctx.volumes()`
+- `ctx.deltas()`
+
+Cache the table once:
+
+```lua
+local closes = ctx.closes()
+for i = 0, ctx.candle_count() - 1 do
+    local close = closes[i]
+end
+```
+
+## Math helpers
+
+```lua
+ctx.sma(field, period, i)
+ctx.ema(field, period, i)
+ctx.rsi(field, period, i)
+ctx.stdev(field, period, i)
+ctx.highest(field, period, i)
+ctx.lowest(field, period, i)
+```
+
+Allowed fields are `close`, `open`, `high`, `low`, `volume`, `buy_volume`, `sell_volume`, and `delta`.
+
+- Non-positive periods return `nil`
+- SMA, RSI, and standard deviation need enough history
+- EMA seeds from the first period and walks through index `i`, so repeated full-history calls can be expensive
+- RSI returns 100 when average loss is zero
+- Highest and lowest allow a partial window beginning at index 0
+
+## Compute output
+
+| Method | Behavior |
+| --- | --- |
+| `ctx.set_value(i, value)` | Writes the primary series. Invalid indexes and non-finite values are ignored. |
+| `ctx.set_series(i, value, name)` | Writes a named series for bands and renderer behavior |
+| `ctx.break_before(i)` | Breaks the primary panel line before index `i` |
+| `ctx.set_panel_range(min, max)` | Requests a fixed panel range when both are finite and max is greater than min |
+| `ctx.set_readout(text)` | Sets panel-header text, truncated to 240 characters |
+| `ctx.hide_primary()` | Hides the default primary line while retaining its values |
+
+The series store and breaks are cleared before every compute.
+
+## Draw API
+
+| Method | Use |
+| --- | --- |
+| `ctx.draw_line(from_i, from_y, to_i, to_y, color, width)` | Line segment |
+| `ctx.draw_hline(y, color, width, style)` | Full active-area horizontal line |
+| `ctx.draw_label(i, y, text, color, font_size)` | Text label |
+| `ctx.draw_rect(from_i, from_y, to_i, to_y, fill, border?)` | Rectangle |
+| `ctx.draw_cell(i, from_y, to_y, fill, border?)` | Full candle-slot panel cell |
+| `ctx.draw_circle(i, y, radius, color)` | Overlay circle |
+| `ctx.draw_bar(i, value, color)` | Panel histogram bar |
+| `ctx.draw_band(upper_name, lower_name, fill)` | Band between two populated named series |
+
+Line styles are `solid`, `dashed`, and `dotted`. Unknown styles become solid.
+
+| Command | Overlay | Panel |
+| --- | --- | --- |
+| Line, hline, label, rect, band | Yes | Yes |
+| Cell | No | Yes |
+| Circle | Yes | No |
+| Bar | No | Yes |
+
+`draw_band` fails unless both named series were populated with `ctx.set_series()`.
+
+## Popups
+
+`ctx.popup(text, opts?)` emits an app-level one-shot popup. Maximum 16 per cycle.
+
+```lua
+ctx.popup("Stop hit", {
+    key = "sl:" .. event.id,
+    title = "Risk Alert",
+    duration_ms = 5000,
+    align = "center",
+    background = "rgba(9, 13, 20, 0.96)",
+    text_color = "#ffffff",
+    border_color = "#ff4d61",
+    title_color = "#ff9aaa",
+    shadow = true,
+    width = 420,
+    font_size = 24,
+    radius = 10,
+})
+```
+
+| Option | Default or limit |
+| --- | --- |
+| Duration | Default 3,000ms, clamped 250 to 30,000ms |
+| Align | `left`, `center`, or `right` |
+| Width | Optional, clamped 220 to 760 |
+| Font size | Optional, clamped 12 to 72 |
+| Radius | Optional, clamped 0 to 32 |
+
+Color option strings are limited to 64 characters. Popup text is plain text. Use a stable `key` so a recompute does not repeat the same event alert.
+
+## Logging and state
+
+```lua
+print("message")
+log.info("message")
+log.warning("message")
+log.error("message")
+```
+
+`print` maps to info. Multiple arguments are joined with spaces. Tables log as `[table]`. The newest 500 rows are retained per instance.
+
+`ctx.state` persists across recomputes only. It does not survive source reload, removal, worker replacement, or app restart.
+
+## Trading methods
+
+The active order-intent APIs are flat methods:
+
+- `ctx.trade_armed()`
+- `ctx.trade_mode()`
+- `ctx.is_backtest()`
+- `ctx.trade_market(opts)`
+- `ctx.trade_limit(opts)`
+- `ctx.trade_cancel(tag)`
+- `ctx.trade_close()`
+- `ctx.trade_set_tpsl(opts)`
+
+There is no active `ctx.trade` table. See [Lua Algo Automation](/indicators/algo-automation) for signatures, rails, arming, and idempotency.
+
+## Retired names
+
+These names belonged to the older Iced implementation and are not current APIs:
+
+| Retired name | Current replacement |
+| --- | --- |
+| `ctx.draw_line_series(...)` | Loop with `ctx.draw_line`, or use panel `ctx.set_value` |
+| `ctx.break_at(i)` | `ctx.break_before(i)` |
+| `ctx.utc_day(i)` | `ctx.session_id(i, 0)` |
+| `ctx.cvd(i)` | `ctx.daily_cvd(i)` |
+| `ctx.set_series_value(...)` | `ctx.set_series(...)` |
+| `ctx.trade.market(...)` | `ctx.trade_market(...)` |
+| `ctx.trade.limit(...)` | `ctx.trade_limit(...)` |
+
+Some editor hints can still mention retired names. This reference describes the current Tauri contract.
+
+## Author checklist
+
+1. Use zero-based loops.
+2. Declare only optional data the script needs.
+3. Nil-check every sparse or optional value.
+4. Treat current candle volume fields as USD notional.
+5. Treat footprint quantities as base asset.
+6. Inspect heatmap `unit` and `exact` before using a currency label.
+7. Break cumulative series at session resets.
+8. Use stable popup and entry tags.
+9. Avoid bulk allocation and expensive profile work inside loops.
+10. Skip decorative drawing in backtests.
+11. Validate, run on a pane, inspect logs, test missing data, test source reload, and compare aggregated with venue behavior.

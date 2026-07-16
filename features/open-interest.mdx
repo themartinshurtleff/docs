@@ -1,0 +1,64 @@
+---
+title: "Open Interest and Net Positioning"
+description: "Use OI level, OI Delta, Daily OI CVD, and modeled net positioning"
+---
+
+# Open Interest and Net Positioning
+
+Open interest helps separate new risk entering the market from existing risk leaving it.
+
+TradeNet provides three direct OI metrics and one modeled positioning indicator.
+
+## Open Interest
+
+The Open Interest row shows the level of outstanding derivatives exposure.
+
+The backend retains OI level in base-asset units. The chart display converts it to USD with the matching candle close so the plotted level is easier to compare with USD OI Delta.
+
+## OI Delta
+
+OI Delta is the change in open interest during the candle, shown in USD.
+
+General interpretations:
+
+- Price up, OI up: new exposure is entering during the rise
+- Price down, OI up: new exposure is entering during the decline
+- Price up, OI down: positions are closing into the rise
+- Price down, OI down: positions are closing into the decline
+
+These are descriptions, not automatic long or short labels.
+
+## Daily OI CVD
+
+Daily OI CVD accumulates OI Delta and resets at UTC midnight.
+
+It shows whether the session has added or removed net open interest over time. It is not a rolling 24-hour metric.
+
+## Venue selection
+
+OI metrics can use supported subsets of Binance, Bybit, and OKX on aggregated markets.
+
+Keep the selected venue set consistent when comparing OI with other aggregated metrics.
+
+## Net Positioning
+
+Net Positioning estimates how OI change may be distributed between long and short positioning using:
+
+- Aggressor flow
+- Price pressure
+- OI change
+- Configurable smoothing and flow weighting
+
+The indicator preserves the OI-change total while allocating modeled long and short components.
+
+It is not exchange-reported long and short account positioning.
+
+## Practical reading
+
+Use OI with price, delta, and liquidations.
+
+For example, a sharp move down with a large negative OI Delta and long-liquidation events is better described as an OI flush or OI contraction than as an exact count of liquidated longs.
+
+<Note>
+OI history begins when the backend has retained samples. After a service restart, the newest hot history must rebuild. Missing OI is shown as missing, not zero.
+</Note>
